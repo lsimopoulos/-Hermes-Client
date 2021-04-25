@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Grpc.Core;
@@ -14,18 +15,28 @@ namespace Hermes.Client_Console
             Console.ForegroundColor = ConsoleColor.Blue;
             Console.WriteLine("Welcome to Hermes chat client");
             Console.WriteLine("Please enter your name:");
-            Console.ForegroundColor = ConsoleColor.White; ;
+            Console.ForegroundColor = ConsoleColor.White;
             var name = Console.ReadLine();
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("Please enter your password:");
+            Console.ForegroundColor = ConsoleColor.White; ;
+            var password = Console.ReadLine();
+
+            var token = await TokenHelper.GetAccessToken( name, password);
+            if (token == null)
+            {
+                Environment.Exit(-1);
+            }
+
             // The port number(5001) must match the port of the gRPC server.
             Console.ForegroundColor = ConsoleColor.Blue;
-             var channel = GrpcChannel.ForAddress("https://localhost:5001");
+            var channel = CreateAuthenticatedChannel($"https://localhost:5001", token);
             var client = new Chatter.ChatterClient(channel);
             Console.WriteLine("Type a message");
             Console.ForegroundColor = ConsoleColor.White;
-           
 
-
-            using var streaming = client.Chat(new Metadata { new("Name", name) });
+            using var streaming = client.Chat();
             var _ = Task.Run(async () =>
             {
                 while (await streaming.ResponseStream.MoveNext())
@@ -41,7 +52,6 @@ namespace Hermes.Client_Console
 
             while (!string.Equals(message, "q!", StringComparison.OrdinalIgnoreCase))
             {
-                CleanUpConsole();
                 await streaming.RequestStream.WriteAsync(new SendRequest() { Message = message });
                 message = Console.ReadLine();
 
@@ -49,6 +59,38 @@ namespace Hermes.Client_Console
             await streaming.RequestStream.CompleteAsync();
 
 
+        }
+
+        //code taken from https://docs.microsoft.com/en-us/aspnet/core/grpc/authn-and-authz?view=aspnetcore-5.0
+        private static GrpcChannel CreateAuthenticatedChannel(string address, string token)
+        {
+            static HttpClientHandler GetHttpClientHandler()
+            {
+                var httpHandler = new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback =
+                        HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                };
+                return httpHandler;
+            }
+
+            var credentials = CallCredentials.FromInterceptor((_, metadata) =>
+            {
+                if (!string.IsNullOrEmpty(token))
+                {
+                    metadata.Add("Authorization", $"Bearer {token}");
+                }
+                return Task.CompletedTask;
+            });
+
+            // SslCredentials is used here because this channel is using TLS.
+            // CallCredentials can't be used with ChannelCredentials.Insecure on non-TLS channels.
+            var channel = GrpcChannel.ForAddress(address, new GrpcChannelOptions
+            {
+                Credentials = ChannelCredentials.Create(new SslCredentials(), credentials),
+                HttpHandler = GetHttpClientHandler()
+            });
+            return channel;
         }
 
         private static void CleanUpConsole()
