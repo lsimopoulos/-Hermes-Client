@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net.Http;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -14,6 +13,7 @@ namespace Hermes.Client_Console
         {
             Console.ForegroundColor = ConsoleColor.Blue;
             Console.WriteLine("Welcome to Hermes chat client");
+            Console.WriteLine("Register new account");
             Console.WriteLine("Please enter your name:");
             Console.ForegroundColor = ConsoleColor.White;
             var name = Console.ReadLine();
@@ -23,6 +23,10 @@ namespace Hermes.Client_Console
             Console.ForegroundColor = ConsoleColor.White; ;
             var password = Console.ReadLine();
 
+            if (await TokenHelper.Register(name, password) == false)
+            {
+                Environment.Exit(-1);
+            }
             var token = await TokenHelper.GetAccessToken( name, password);
             if (token == null)
             {
