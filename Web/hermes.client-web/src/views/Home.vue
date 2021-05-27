@@ -9,9 +9,9 @@
         <h2 class="subtitle">
           A chat based on grpc
         </h2>
-        <div class="button-block">
+        <!-- <div class="button-block">
           <button class="button is-xl is-dark">Register</button>
-        </div>
+        </div> -->
       </div>
     </div>
   </section>

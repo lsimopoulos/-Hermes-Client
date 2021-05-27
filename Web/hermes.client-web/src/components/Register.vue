@@ -20,7 +20,7 @@
           </div>
 
           <div class="form-group">
-            <button class="btn btn-primary btn-block" :disabled="loading">
+            <button class="button-block" :disabled="loading">
               <span
                 v-show="loading"
                 class="spinner-border spinner-border-sm"
@@ -76,9 +76,9 @@ export default {
     };
   },
   computed: {
-    loggedIn() {
-      return this.$store.state.auth.status.loggedIn;
-    },
+    // loggedIn() {
+    //   
+    // },
   },
   mounted() {
     if (this.loggedIn) {
