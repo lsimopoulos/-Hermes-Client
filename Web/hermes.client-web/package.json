@@ -16,7 +16,7 @@
     "vue": "^3.0.0",
     "vue-oidc-client": "^1.0.0-alpha.2",
     "vue-router": "^4.0.8",
-    "vue-router-next": "^4.0.8",
+    "vue-advanced-chat": "^1.2.1",
     "vuex": "^4.0.0-0",
     "yup": "^0.32.9"
   },

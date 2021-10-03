@@ -70,16 +70,6 @@ export default {
       schema,
     };
   },
-  computed: {
-    // loggedIn() {
-    //   
-    // },
-  },
-  mounted() {
-    if (this.loggedIn) {
-      this.$router.push("/chat");
-    }
-  },
   methods: {
    
   },

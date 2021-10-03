@@ -9,21 +9,28 @@
         <h2 class="subtitle">
           A chat based on grpc
         </h2>
-        <!-- <div class="button-block">
-          <button class="button is-xl is-dark">Register</button>
-        </div> -->
       </div>
     </div>
   </section>
-   <Register />
+   <Chat v-if="loggedin" />
+   <Register v-else />
+   
 </div>
 </template>
 <script>
 import Register from '../components/Register';
+import Chat from '../components/Chat';
+
 export default {
   name: 'home',
   components: {
-    Register
+    Register,
+    Chat
+  },
+  data() {
+    return {
+      loggedin: true
+    }
   }
 }
 </script>
