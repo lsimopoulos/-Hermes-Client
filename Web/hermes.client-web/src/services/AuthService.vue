@@ -9,4 +9,14 @@ const tokenClient = createOidcAuth('main', SignInType.Window, appUrl , {
   scope: 'hermes'
 });
 
+idsrvAuth.events.addAccessTokenExpiring(function() {
+  
+})
+
+idsrvAuth.events.addAccessTokenExpired(function() {
+
+})
+
+idsrvAuth.events.addUserSignedOut(function() {
+})
 export default tokenClient;
