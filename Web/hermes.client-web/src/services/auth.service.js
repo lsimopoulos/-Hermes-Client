@@ -1,5 +1,4 @@
 import axios from 'axios';
-import https from 'https';
 
 const API_URL = 'https://localhost:7001/';
 
@@ -34,10 +33,6 @@ class AuthService {
         Accept: 'application/json'
       }})
       .then(response => {
-        if (response.data.access_token) {
-          console.log(response.data.access_token);
-          console.log(response.data.refresh_token);
-        }
         return response.data;
       }) .catch((err) => {
         console.log(err);
