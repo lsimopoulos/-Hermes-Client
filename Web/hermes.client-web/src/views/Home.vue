@@ -1,6 +1,6 @@
 <template>
 <div class="home">
-  <section class="hero is-dark">
+<section class="hero is-dark">
     <div class="hero-body">
       <div class="container">
         <h1 class="title">
@@ -11,21 +11,19 @@
         </h2>
       </div>
     </div>
-  </section>
-   <Chat v-if="loggedin" />
-   <Register v-else />
+  </section> 
+  <!-- <Chat v-if="loggedin" />  -->
+ 
    
 </div>
 </template>
 <script>
-import Register from '../components/Register';
-import Chat from '../components/Chat';
+// import Chat from '../components/Chat';
 
 export default {
   name: 'home',
   components: {
-    Register,
-    Chat
+    // Chat
   },
   data() {
     return {
@@ -34,44 +32,6 @@ export default {
   }
 }
 </script>
-<style lang="scss" scoped>
-  .hero {    
-    text-align: center;
-    background-image: url('../assets/logo.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    height: 400px;
-  }
-  .hero-body .title {
-    text-shadow: 4px 4px 4px rgba(0, 0, 0, 0.6);
-    padding: 40px 0 20px 0;
-    font-size: 60px;
-  }
-  .subtitle {
-    text-shadow: 4px 4px 4px rgba(0, 0, 0, 0.7);
-    font-size: 30px;
-  }
-  .button-block {
-    text-align: center;
-    margin-left: auto;
-    margin-right: auto;
-    width: 100%;
-    position: absolute;
-    bottom: -150px;
-    .button {
-      margin-right: 50px;
-      padding-left: 50px;
-      padding-right: 50px;
-    }
-    .welcome {
-      width: 400px;
-      padding: 10px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-  }
-  .is-xl {
-    font-size: 1.7rem;
-  }
+<style>
+ 
 </style>

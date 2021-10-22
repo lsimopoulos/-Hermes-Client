@@ -13,7 +13,7 @@
     </div>
   </div>
 </template>
-<style lang="scss" scoped>
+<style >
   .org-description {
     margin-top: 50px;
   }

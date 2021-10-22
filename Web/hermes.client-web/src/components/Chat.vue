@@ -14,7 +14,7 @@
   import { SendRequest } from '../proto/hermes_pb';
   import { ChatterClient } from '../proto/hermes_grpc_web_pb';
 
-  const client = new ChatterClient('http://localhost:8080');
+  const client = new ChatterClient('https://localhost:5001');
 
   const message = new SendRequest();
   message.setMessage("WOW");
