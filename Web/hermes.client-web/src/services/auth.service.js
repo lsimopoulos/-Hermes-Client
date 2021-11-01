@@ -23,15 +23,14 @@ class AuthService {
     '&' +
     'scope=' +
     encodeURI('hermes+offline_access');
-
+    
+    const headers =  { 
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Authorization: 'Basic' + ' ' + btoa('chat_web_client:websuperdupersecret'),
+      Accept: 'application/json'
+    }
      return  axios
-      .post(API_URL + 'connect/token', body,
-      {
-      headers: { 
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Authorization: 'Basic' + ' ' + btoa('chat_web_client:websuperdupersecret'),
-        Accept: 'application/json'
-      }})
+      .post(API_URL + 'connect/token', body,headers)
       .then(response => {
         return response.data;
       }) .catch((err) => {
@@ -41,15 +40,9 @@ class AuthService {
 
 
   register(email,password) {
-    const agent = new https.Agent({
-      rejectUnauthorized: false,
-    });
     return axios.post(API_URL + 'api/Users/Register/', {
       username: email,
       password: password
-    },{
-      httpsAgent : agent
-
     })
     .catch((error) => {
       if (error.response) {
