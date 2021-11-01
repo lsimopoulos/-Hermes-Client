@@ -51,7 +51,7 @@ class AuthService {
       httpsAgent : agent
 
     })
-    .catch(function (error) {
+    .catch((error) => {
       if (error.response) {
         // Request made and server responded
         console.log(error.response.data);

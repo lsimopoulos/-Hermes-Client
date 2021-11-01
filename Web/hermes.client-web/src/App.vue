@@ -26,20 +26,21 @@
         </li>
       </div>
 
-      <div v-if="!isLoggedIn" class="navbar-nav ml-auto">
-        <li class="nav-item">
-          <router-link to="/sign" class="nav-link">
-            <font-awesome-icon icon="user-plus" />
-            <span class="navbar-icon-text">Sign</span>
-          </router-link>
-        </li>
-      </div>
+    
 
       <div v-if="isLoggedIn" class="navbar-nav ml-auto">
         <li class="nav-item">
           <a class="nav-link active"  href="javascript:void(0);" @click="logOut">
             <font-awesome-icon icon="sign-out-alt" /> LogOut
           </a>
+        </li>
+      </div>
+        <div v-else class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <router-link to="/sign" class="nav-link">
+            <font-awesome-icon icon="user-plus" />
+            <span class="navbar-icon-text">Sign</span>
+          </router-link>
         </li>
       </div>
     </nav>
