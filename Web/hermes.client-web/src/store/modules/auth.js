@@ -3,7 +3,8 @@ import AuthService from '../../services/auth.service';
 export const auth = {
   namespaced: true,
   state: {
-    status: { loggedIn: false }
+    status: { loggedIn: false },
+    token : { access_token: '', refresh_token: ''}
   },
   actions: {
     attemptLogin({ commit }, { email, password }) {

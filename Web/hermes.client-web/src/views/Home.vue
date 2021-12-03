@@ -12,18 +12,18 @@
       </div>
     </div>
   </section> 
-  <!-- <Chat v-if="loggedin" />  -->
+  <Chat v-if="loggedin" /> 
  
    
 </div>
 </template>
 <script>
-// import Chat from '../components/Chat';
+ import Chat from '../components/Chat';
 
 export default {
   name: 'home',
   components: {
-    // Chat
+     Chat
   },
   data() {
     return {
