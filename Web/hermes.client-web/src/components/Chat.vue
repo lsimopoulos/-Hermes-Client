@@ -27,10 +27,10 @@ this.connect();
     },
     methods : {
    connect () {
-       const token = this.$store.getters.token.access_token;
+       const token = this.$store.getters['auth/access_token'];
       const metadata = { 'authorization': 'Bearer ' + token }
       var request = new SendRequest()
-      request.setName('WOW')
+      // request.setName('WOW')
       this.client.chat(request, metadata, (err, response) => {
         if (err) {
           console.log(`Unexpected error for sayHello: code = ${err.code}, message = "${err.message}"`)
