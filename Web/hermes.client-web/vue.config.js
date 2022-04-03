@@ -1,7 +1,10 @@
 module.exports = {
   devServer: {
-    https: true,
+    server: {
+      type: 'https'
+    },
     host: 'localhost',
-    disableHostCheck: true
+    hot: "only", // hot:true
+    allowedHosts: "all",
   },
 }

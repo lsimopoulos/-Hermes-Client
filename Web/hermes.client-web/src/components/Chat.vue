@@ -17,7 +17,7 @@
   
 
   export default {
-    name: "Chat",
+    name: "Chat-component",
      created () {
     this.client = new ChatterClient('https://localhost:5001', CallCredentials.createFromPlugin, null);
 this.connect();
