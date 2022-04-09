@@ -12,24 +12,24 @@
       </div>
     </div>
   </section> 
-  <Chat v-if="loggedin" /> 
+  <ChatComponent v-if="isLoggedIn" /> 
  
    
 </div>
 </template>
 <script>
- import Chat from '../components/Chat';
+ import ChatComponent from '../components/ChatComponent';
 
 export default {
-  name: 'home',
+  name: 'HomeView',
   components: {
-     Chat
+     ChatComponent
   },
-  data() {
-    return {
-      loggedin: true
+  computed: {
+    isLoggedIn() {
+      return this.$store.state.auth.status.loggedIn;
     }
-  }
+   },
 }
 </script>
 <style>

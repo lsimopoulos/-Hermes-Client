@@ -1,7 +1,4 @@
 syntax = "proto3";
-
-option csharp_namespace = "Hermes.Client_Console.Protos";
-
 package chat;
 
 // The chatter service definition.
