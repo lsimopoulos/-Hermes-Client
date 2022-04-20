@@ -70,5 +70,61 @@ proto.chat.ChatterPromiseClient =
 };
 
 
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.chat.sendRequest,
+ *   !proto.chat.chatReply>}
+ */
+const methodDescriptor_Chatter_chat = new grpc.web.MethodDescriptor(
+  '/chat.Chatter/chat',
+  grpc.web.MethodType.SERVER_STREAMING,
+  proto.chat.sendRequest,
+  proto.chat.chatReply,
+  /**
+   * @param {!proto.chat.sendRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.chat.chatReply.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.chat.sendRequest} request The request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!grpc.web.ClientReadableStream<!proto.chat.chatReply>}
+ *     The XHR Node Readable Stream
+ */
+proto.chat.ChatterClient.prototype.chat =
+    function(request, metadata) {
+  return this.client_.serverStreaming(this.hostname_ +
+      '/chat.Chatter/chat',
+      request,
+      metadata || {},
+      methodDescriptor_Chatter_chat);
+};
+
+
+/**
+ * @param {!proto.chat.sendRequest} request The request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!grpc.web.ClientReadableStream<!proto.chat.chatReply>}
+ *     The XHR Node Readable Stream
+ */
+proto.chat.ChatterPromiseClient.prototype.chat =
+    function(request, metadata) {
+  return this.client_.serverStreaming(this.hostname_ +
+      '/chat.Chatter/chat',
+      request,
+      metadata || {},
+      methodDescriptor_Chatter_chat);
+};
+
+
 module.exports = proto.chat;
 

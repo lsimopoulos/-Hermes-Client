@@ -21,7 +21,7 @@ static_resources:
             - name: local_service
               domains: ["*"]
               routes:
-              - match: { prefix: "/" }
+              - match: { prefix: "/",grpc: {} }
                 route:
                   cluster: greeter_service
                   timeout: 0s

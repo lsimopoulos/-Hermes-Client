@@ -4,16 +4,18 @@ package chat;
 // The chatter service definition.
 service Chatter {
 	//Chat a text message
-	rpc Chat (stream SendRequest) returns (stream ChatReply);
+	rpc chat(sendRequest) returns (stream chatReply);
 }
 
-// The request message containing the  message.
-message SendRequest {
+message sendRequest {
 	string message = 1;
+	string time = 2;
 }
 
 
 // The response message containing the message.
-message ChatReply {
+message chatReply {
 	string message = 1;
+	string time = 2;
+	string name = 3;
 }
