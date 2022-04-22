@@ -2,7 +2,7 @@
  <div 
   :class="isSelf ? 'msgContainer' : 'msgContainer darker'">
   <p>{{ message }}</p>
-  <span class="time-right">{{ time }}</span>
+  <span :class="isSelf ? 'time-right' : 'time-left'">{{ time }}</span>
 </div>
 
 </template>
