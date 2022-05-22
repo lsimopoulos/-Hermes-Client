@@ -1,5 +1,5 @@
 <template>
-  <div class="about">
+  <div class="aboutView">
     <div class="hero is-primary">
       <div class="hero-body">
         <div class="container">

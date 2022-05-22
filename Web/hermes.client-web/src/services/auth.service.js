@@ -18,16 +18,14 @@ class AuthService {
     'client_id=' +
     encodeURI('chat_web_client') +
     '&' +
-    'secret=' +
-    encodeURI('sdEV08N34f95x2Z/mFlx+gXyy3tzrqi6LEsvFwM1+p+M=ecre') +
+    'client_secret='  +
+    encodeURI('websuperdupersecret') +
     '&' +
     'scope=' +
     encodeURI('hermes+offline_access');
     
     const headers =  { 
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Authorization: 'Basic' + ' ' + btoa('chat_web_client:websuperdupersecret'),
-      Accept: 'application/json'
+      'Content-Type': 'application/x-www-form-urlencoded'
     }
      return  axios
       .post(API_URL + 'connect/token', body,headers)
@@ -39,10 +37,10 @@ class AuthService {
   }
 
 
-  register(email,password) {
+  register(user) {
     return axios.post(API_URL + 'api/Users/Register/', {
-      username: email,
-      password: password
+      username: user.email,
+      password: user.password
     })
     .catch((error) => {
       if (error.response) {
