@@ -6,10 +6,11 @@
 </template>
 <script>
   import { sendRequest } from '../proto/hermes_pb';
-  import { ChatterClient } from '../proto/hermes_grpc_web_pb';
+  import { ChatterClient} from '../proto/hermes_grpc_web_pb';
   import { CallCredentials } from '@grpc/grpc-js/build/src/call-credentials'
   import  ChatMessage  from './ChatMessage.vue'
   import { createApp, h } from 'vue'
+  var google_protobuf_empty_pb = require('google-protobuf/google/protobuf/empty_pb.js');
   
 
   export default {
@@ -31,47 +32,14 @@
    connect () {
       
        this.client = new ChatterClient('https://localhost:5001', CallCredentials.createFromPlugin, null);
-       this.sendMessage()
-   
-   },
-     getNow() {
-                    const today = new Date();
-                    return today.getHours() + ":" + today.getMinutes();
-                },
-   createChatMessageControl(message,time,isSelf)
-   {
-     var cm = createApp({ 
-  setup () {
-    return () => h(ChatMessage, { message: message, time: time,isSelf: isSelf})
-  }
-});
-// inserting to dom
-const wrapper = document.createElement("div")
-cm.mount(wrapper)
-document.body.appendChild(wrapper)
- 
-   },
-   sendMessage()
-   {
-      this
       const token = this.$store.getters['auth/access_token'];
       const metadata = { 'Authorization': 'Bearer ' + token , 'Content-Type' :'application/grpc-web-text'};
-      var request = new sendRequest();
-      request.setMessage(this.chatMsg)
-      var time = this.getNow()
-      request.setTime(time)
-      
-      if(this.chatMsg)
-      {
-        this.createChatMessageControl(this.chatMsg,time,false)
-         this.$refs["txtarea"].value = "";
-      }
-     
-      var  call =  this.client.chat(request,metadata);
+    
+        var  call =  this.client.connect(new google_protobuf_empty_pb.Empty,metadata);
      call.on('data', function (result) {
        console.log(result)
        
-          this.createChatMessageControl(result.getMessage(),result.getTime(),true)
+          this.createChatMessageControl(result.getMessage(),result.getFrom(),result.getTime(),true)
 
        }.bind(this));
 
@@ -83,8 +51,52 @@ document.body.appendChild(wrapper)
     call.on("end", () => {
       console.log("Stream ended.");
     });
-   }
+   
+   },
+     getNow() {
+                    const today = new Date();
+                    return today.getHours() + ":" + today.getMinutes();
+                },
+   createChatMessageControl(message,from,time,isSelf)
+   {
+     var cm = createApp({ 
+  setup () {
+    return () => h(ChatMessage, { message: message,from:from, time: time,isSelf: isSelf})
+  }
+});
+// inserting to dom
+const wrapper = document.createElement("div")
+cm.mount(wrapper)
+document.body.appendChild(wrapper)
+ 
+   },
+
+   sendMessage()
+   {
+      const token = this.$store.getters['auth/access_token'];
+      const metadata = { 'Authorization': 'Bearer ' + token , 'Content-Type' :'application/grpc-web-text'};
+      var request = new sendRequest();
+      request.setMessage(this.chatMsg)
+      
+      var time = this.getNow()
+      request.setTime(time)
+      
+      if(this.chatMsg)
+      {
+        this.createChatMessageControl(this.chatMsg,"Me",time,false)
+         this.$refs["txtarea"].value = "";
+      }
+      this.client.chat(request,metadata, function(err, response) {
+  if (err) {
+    console.log(err.code);
+    console.log(err.message);
+  } else {
+    console.log(response.getMessage());
+  }
+});
+  
     
+   }
     },
     data() {
       return {

@@ -1,15 +1,17 @@
 syntax = "proto3";
+import "google/protobuf/empty.proto";
 package chat;
 
 // The chatter service definition.
 service Chatter {
-	//Chat a text message
-	rpc chat(sendRequest) returns (stream chatReply);
+	rpc chat(sendRequest) returns (google.protobuf.Empty);
+	rpc connect(google.protobuf.Empty) returns (stream chatReply);
 }
 
 message sendRequest {
 	string message = 1;
 	string time = 2;
+	string to = 3;
 }
 
 
@@ -17,5 +19,6 @@ message sendRequest {
 message chatReply {
 	string message = 1;
 	string time = 2;
-	string name = 3;
+	string from = 3;
+	string to = 4;
 }

@@ -1,6 +1,7 @@
 <template>
  <div 
   :class="isSelf ? 'msgContainer' : 'msgContainer darker'">
+   <p :class="isSelf ? 'right' :' left'">{{ from}} </p>
   <p>{{ message }}</p>
   <span :class="isSelf ? 'time-right' : 'time-left'">{{ time }}</span>
 </div>
@@ -9,7 +10,7 @@
 <script>
  export default {
    name: 'ChatMessage',
-   props: [ 'message','time','isSelf' ],
+   props: [ 'message','from','time','isSelf' ],
  }
 </script>
 <style>
@@ -44,11 +45,15 @@
   border-radius: 50%;
 }
 
-/* Style the right image */
-.msgContainer img.right {
+.msgContainer p.right {
   float: right;
   margin-left: 20px;
   margin-right:0;
+}
+.msgContainer p.left {
+  float: left;
+  margin-right: 20px;
+  border-radius: 50%;
 }
 
 /* Style time text */
