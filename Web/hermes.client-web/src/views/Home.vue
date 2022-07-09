@@ -18,7 +18,7 @@
 </div>
 </template>
 <script>
- import ChatComponent from '../components/ChatComponent';
+ import ChatComponent from '../components/HermesChatFeatureComponent';
 
 export default {
   name: 'HomeView',

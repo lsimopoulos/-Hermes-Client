@@ -1,11 +1,9 @@
 <template>
- <div 
-  :class="isSelf ? 'msgContainer' : 'msgContainer darker'">
-   <p :class="isSelf ? 'right' :' left'">{{ from}} </p>
-  <p>{{ message }}</p>
-  <span :class="isSelf ? 'time-right' : 'time-left'">{{ time }}</span>
-</div>
-
+  <div :class="isSelf ? 'msgContainer' : 'msgContainer darker'">
+    <p :class="isSelf ? 'right' : 'left'">{{ from }}</p>
+    <p>{{ message }}</p>
+    <span :class="isSelf ? 'time-right' : 'time-left'">{{ time }}</span>
+  </div>
 </template>
 <script>
  export default {
@@ -14,7 +12,7 @@
  }
 </script>
 <style>
- /* Chat containers */
+/* Chat containers */
 .msgContainer {
   border: 2px solid #dedede;
   background-color: #f1f1f1;
@@ -48,7 +46,7 @@
 .msgContainer p.right {
   float: right;
   margin-left: 20px;
-  margin-right:0;
+  margin-right: 0;
 }
 .msgContainer p.left {
   float: left;

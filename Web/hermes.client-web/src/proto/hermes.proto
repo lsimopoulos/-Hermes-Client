@@ -6,12 +6,15 @@ package chat;
 service Chatter {
 	rpc chat(sendRequest) returns (google.protobuf.Empty);
 	rpc connect(google.protobuf.Empty) returns (stream chatReply);
+	rpc getContacts(google.protobuf.Empty) returns (getContactsReply);
+	rpc addContact(addContactRequest) returns (contact);
 }
 
 message sendRequest {
 	string message = 1;
 	string time = 2;
 	string to = 3;
+	string from = 4;
 }
 
 
@@ -21,4 +24,20 @@ message chatReply {
 	string time = 2;
 	string from = 3;
 	string to = 4;
+}
+
+message getContactsReply {
+	repeated contact contacts = 1;
+}
+
+message addContactRequest{
+	string email = 1;
+}
+message contact {
+	string id =1;
+	string name = 2;
+}
+message contactsReply {
+	string id =1;
+	string name = 2;
 }
