@@ -1,9 +1,9 @@
 <template>
   <div class="contact">
-    <img  src="@/assets/user.png" />
-    <p>
-        <strong>{{name}}</strong>
-        <span>{{email}}</span>
+    <img src="@/assets/user.png" />
+    <p >
+      <strong :class="hasNewMessages ? 'p_strong_bold_text' : 'p_strong'">{{ name }}</strong>
+      <span :class="hasNewMessages ? 'p_span_bold_text' : 'p_span'">{{ email }}</span>
     </p>
     <div :class="hasNewMessages ? 'status online' : ''"></div>
   </div>
@@ -48,14 +48,25 @@
   float: left;
   width: 220px;
 }
-.contact p strong {
-  font-weight: 600;
+.p_strong {
+  font-weight: 400;
   font-size: 15px;
   color: #597a96;
 }
-.contact p span {
+
+.p_strong_bold_text {
+  font-weight: bold;
+  font-size: 15px;
+  color: #597a96;
+}
+.p_span_bold_text {
+  font-weight: bold;
   font-size: 13px;
-  font-weight: 400;
+  color: #aab8c2;
+}
+.p_span {
+  font-size: 13px;
+  font-weight: 100;
   color: #aab8c2;
 }
 .contact .status {
@@ -68,8 +79,9 @@
   right: 17px;
 }
 .contact {
-  
   cursor: pointer;
 }
-.contact .status.offline{background:#eaeef0;}
+.contact .status.offline {
+  background: #eaeef0;
+}
 </style>

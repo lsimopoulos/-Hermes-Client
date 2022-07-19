@@ -36,8 +36,10 @@ message addContactRequest{
 message contact {
 	string id =1;
 	string name = 2;
+	string email = 3;
 }
 message contactsReply {
 	string id =1;
 	string name = 2;
+	string email = 3;
 }

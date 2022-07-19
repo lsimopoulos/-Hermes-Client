@@ -3,8 +3,23 @@ import axios from 'axios';
 const API_URL = 'https://localhost:7001/';
 
 class AuthService {
-  
-  login({email,password}) {
+
+  handleErrorResponse(error) {
+    let errorResponse;
+    if(error.response && error.response.data) {
+      // I expect the API to handle error responses in valid format
+      errorResponse = error.response.data;
+      // JSON stringify if you need the json and use it later
+    } else if(error.request) {
+      // TO Handle the default error response for Network failure or 404 etc.,
+      errorResponse = error.request.message || error.request.statusText;
+    } else {
+      errorResponse = error.message;
+    }
+    throw new Error(errorResponse);
+  }
+
+  async login({email,password}) {
     var body =
     'username=' +
     encodeURIComponent(email) +
@@ -27,39 +42,19 @@ class AuthService {
     const headers =  { 
       'Content-Type': 'application/x-www-form-urlencoded'
     }
-     return  axios
-      .post(API_URL + 'connect/token', body,headers)
-      .then(response => {
-        return response.data;
-      }) .catch((err) => {
-        console.log(err);
-    });
+     const response = await axios
+      .post(API_URL + 'connect/token', body, headers);
+    return response.data;
   }
+
+  
 
 
   register(user) {
     return axios.post(API_URL + 'api/Users/Register/', {
       username: user.email,
-      password: user.password
-    })
-    .catch((error) => {
-      if (error.response) {
-        // Request made and server responded
-        console.log(error.response.data);
-        console.log(error.response.status);
-        console.log(error.response.headers);
-      } 
-      else if (error.request) {
-        // The request was made but no response was received
-        console.log('Error:', error.message);
-        console.log(error.request);
-      } 
-      else {
-        // Something happened in setting up the request that triggered an Error
-        console.log('Error:', error.message);
-      }
-
-  
+      password: user.password,
+      name: user.name
     })
   }
 }

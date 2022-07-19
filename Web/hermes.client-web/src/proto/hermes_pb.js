@@ -912,7 +912,8 @@ proto.chat.contact.prototype.toObject = function(opt_includeInstance) {
 proto.chat.contact.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    name: jspb.Message.getFieldWithDefault(msg, 2, "")
+    name: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    email: jspb.Message.getFieldWithDefault(msg, 3, "")
   };
 
   if (includeInstance) {
@@ -957,6 +958,10 @@ proto.chat.contact.deserializeBinaryFromReader = function(msg, reader) {
       var value = /** @type {string} */ (reader.readString());
       msg.setName(value);
       break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setEmail(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -1000,6 +1005,13 @@ proto.chat.contact.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
+  f = message.getEmail();
+  if (f.length > 0) {
+    writer.writeString(
+      3,
+      f
+    );
+  }
 };
 
 
@@ -1039,6 +1051,24 @@ proto.chat.contact.prototype.setName = function(value) {
 };
 
 
+/**
+ * optional string email = 3;
+ * @return {string}
+ */
+proto.chat.contact.prototype.getEmail = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.chat.contact} returns this
+ */
+proto.chat.contact.prototype.setEmail = function(value) {
+  return jspb.Message.setProto3StringField(this, 3, value);
+};
+
+
 
 
 
@@ -1072,7 +1102,8 @@ proto.chat.contactsReply.prototype.toObject = function(opt_includeInstance) {
 proto.chat.contactsReply.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    name: jspb.Message.getFieldWithDefault(msg, 2, "")
+    name: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    email: jspb.Message.getFieldWithDefault(msg, 3, "")
   };
 
   if (includeInstance) {
@@ -1117,6 +1148,10 @@ proto.chat.contactsReply.deserializeBinaryFromReader = function(msg, reader) {
       var value = /** @type {string} */ (reader.readString());
       msg.setName(value);
       break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setEmail(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -1160,6 +1195,13 @@ proto.chat.contactsReply.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
+  f = message.getEmail();
+  if (f.length > 0) {
+    writer.writeString(
+      3,
+      f
+    );
+  }
 };
 
 
@@ -1196,6 +1238,24 @@ proto.chat.contactsReply.prototype.getName = function() {
  */
 proto.chat.contactsReply.prototype.setName = function(value) {
   return jspb.Message.setProto3StringField(this, 2, value);
+};
+
+
+/**
+ * optional string email = 3;
+ * @return {string}
+ */
+proto.chat.contactsReply.prototype.getEmail = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.chat.contactsReply} returns this
+ */
+proto.chat.contactsReply.prototype.setEmail = function(value) {
+  return jspb.Message.setProto3StringField(this, 3, value);
 };
 
 

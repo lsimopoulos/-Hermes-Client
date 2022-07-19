@@ -10,7 +10,7 @@
         :class="contact.id === selectedGuid  ? 'highlight-row' : 'table-row'"
         :name="contact.name"
         :hasNewMessages="contact.hasNewMessages"
-        :email="contact.name"
+        :email="contact.email"
         @click="selectContact(contact)" >
       </ContactComponent> 
      </div>
@@ -39,7 +39,6 @@
       if( this.selectedGuid!=contact.id)
       {
         this.selectedGuid = contact.id;
-        // contact.hasNewMessages = false;
          var cnt = this.contacts.find((item)=>item.id=== contact.id)
            if(cnt != null)
               cnt.hasNewMessages = false;

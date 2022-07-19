@@ -6,6 +6,7 @@
       v-model="contacts"
     />
     <ChatWindowComponent
+      v-if="isContactSelected"
       :messages="currentMessages"
       v-model="currentMessages"
     />
@@ -72,7 +73,7 @@
 <script>
   import ContactsListComponent from './ContactsListComponent.vue'
   import ChatWindowComponent from './ChatWindowComponent.vue'
-  import { mapState } from 'vuex';
+  // import { mapState } from 'vuex';
 
   export default {
     name: "HermesChatFeatureComponent",
@@ -80,17 +81,13 @@
     {
     },
     inject: ['$chatService'],
-    created () {
-
-    },
-    computed: mapState(['chat/messages']),
   mounted()
   {
     this.unsubscribe = this.$store.subscribe((mutation, state) => {
       var self = this
       if (mutation.type === 'chat/addChatMessage' ) {
-      
-        if( self.$store.getters['user/selected_contact'] != null && mutation.payload.chatMessage.name != self.$store.getters['user/selected_contact'].name && mutation.payload.chatMessage.isSelf == false){
+      const selectContact = self.$store.getters['user/selected_contact'];
+        if( (selectContact!= null && mutation.payload.chatMessage.name !=selectContact.name && mutation.payload.chatMessage.isSelf == false) || selectContact == null){
            var contact = self.contacts.find((item)=>item.id=== mutation.payload.contactId)
            if(contact != null)
               contact.hasNewMessages = true;
@@ -109,6 +106,12 @@
        ContactsListComponent,
        ChatWindowComponent
     },
+     computed: {
+      // mapState(['chat/messages']),
+    isContactSelected() {
+      return this.$store.getters['user/selected_contact'] != null;
+    }
+   },
     methods : {
       connect () {
         this.$chatService.connect();
@@ -117,7 +120,7 @@
         if (this.email != "" ) {
           this.$chatService.addContact(this.email)
             .then(response => {
-              const newContact = { id: response.id, name: response.name, hasNewMessages: false}
+              const newContact = { id: response.id, name: response.name, email: response.email, hasNewMessages: false}
               this.contacts.push(newContact);
               this.$store.commit("chat/initiateChat", { contactId: response.id });
         })
@@ -130,7 +133,7 @@
       { 
         
         response.forEach(c => {
-          const newContact = { id: c.id, name : c.name, hasNewMessages : false}
+          const newContact = { id: c.id, name : c.name, email: c.email, hasNewMessages : false}
           this.$store.commit("chat/initiateChat", { contactId: c.id });
           this.contacts.push(newContact)
           });
