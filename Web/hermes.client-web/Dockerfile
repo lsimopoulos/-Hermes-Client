@@ -7,8 +7,8 @@ COPY . .
 RUN yarn run build
 RUN apk update && \
     apk add --update openssl && \     
-    openssl genrsa -des3 -passout pass:"GuwyTUzzDDh3UCaCmuLk" -out localhost.pass.key 4096 && \
-    openssl rsa -passin pass:"GuwyTUzzDDh3UCaCmuLk" -in localhost.pass.key -out localhost.key && \
+    openssl genrsa -des3 -passout pass:"7^TrA#mN208!P2R5sPIqD02Y" -out localhost.pass.key 4096 && \
+    openssl rsa -passin pass:"7^TrA#mN208!P2R5sPIqD02Y" -in localhost.pass.key -out localhost.key && \
     rm localhost.pass.key && \
     openssl req -new -key localhost.key -out localhost.csr \
         -subj "/C=SE/ST=SomeCity/L=SomeState/O=Hermes/CN=localhost.local" && \
