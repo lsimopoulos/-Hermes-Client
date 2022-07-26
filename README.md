@@ -10,12 +10,12 @@ The hermes chat client implemented in [VUE](https://vuejs.org/).
 
 Client
 ```
- docker run -it --name hermes-client leonidassim/hermes-client -p 5555:443
+ docker run -it --name hermes-client -p 55555:443 leonidassim/hermes-client 
 ```
 
 Server
 ```
- docker run -it --name hermes leonidassim/hermes-server -p 5001:5001 -p 7001:7001
+ docker run -it --name hermes -p 5001:5001 -p 7001:7001 leonidassim/hermes-server 
 ```
 
 #### Note ####
