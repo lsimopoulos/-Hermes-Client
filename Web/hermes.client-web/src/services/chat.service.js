@@ -2,12 +2,13 @@ import { sendRequest, addContactRequest } from '../proto/hermes_pb';
 import { ChatterClient } from '../proto/hermes_grpc_web_pb';
 import { CallCredentials } from '@grpc/grpc-js/build/src/call-credentials'
 import store from '../store'
+
 var google_protobuf_empty_pb = require('google-protobuf/google/protobuf/empty_pb.js');
 
 
 var token = null;
 var metadata = null;
-const client = new ChatterClient('https://localhost:5001', CallCredentials.createFromPlugin, null);
+const client = new ChatterClient('https://localhost:55556', CallCredentials.createFromPlugin, null);
 
 
 class ChatService {
@@ -19,7 +20,7 @@ class ChatService {
     streaming_call.on('data', function (result) {
       console.log(result)
       const selectedContact = ref_store.getters['user/getContactIdByEmail'](result.getFrom())
-      const msg = { message: result.getMessage(), name: result.getFrom(), time: result.getTime(), isSelf: false }
+      const msg = { message: result.getMessage(), name: selectedContact.name, time: result.getTime(), isSelf: false }
       ref_store.commit("chat/addChatMessage", { chatMessage: msg, contactId: selectedContact.id });
     }.bind(this));
 
@@ -33,8 +34,23 @@ class ChatService {
     });
   }
 
+  //code taken https://codepremix.com/detect-urls-in-text-and-create-a-link-in-javascript
+  replaceURLs(message) {
+    if(!message) return;
+  /* eslint-disable-next-line */
+    var urlRegex = /(((https?:\/\/)|(www\.))[^\s]+)/g;
+    return message.replace(urlRegex, function (url) {
+      var hyperlink = url;
+      /* eslint-disable-next-line */
+      if (!hyperlink.match('^https?:\/\/')) {
+        hyperlink = 'http://' + hyperlink;
+      }
+      return '<a href="' + hyperlink + '" target="_blank" rel="noopener noreferrer">' + url + '</a>'
+    });
+  }
+  
   getNow() {
-    return new Date().toLocaleTimeString(navigator.language, {hour: '2-digit', minute:'2-digit'});
+    return new Date().toLocaleTimeString(navigator.language, { hour: '2-digit', minute: '2-digit' });
   }
 
   addContact(email) {
@@ -48,7 +64,8 @@ class ChatService {
           return reject(err)
         }
         const contact = response.toObject();
-        store.commit("user/addContact", { contact: contact })
+        const newContact = { id: contact.id, name: contact.name, email: contact.email, hasNewMessages: false, numberOfUnreadMessages: 0 }
+        store.commit("user/addContact", { contact: newContact })
         resolve(contact);
 
 
@@ -58,6 +75,7 @@ class ChatService {
 
   sendMessage(chatMsg) {
     var request = new sendRequest();
+    chatMsg = this.replaceURLs(chatMsg)
     request.setMessage(chatMsg)
 
     var time = this.getNow();
@@ -86,7 +104,12 @@ class ChatService {
       if (err) {
         return reject(err)
       }
-      var contacts = response.toObject().contactsList;
+      let contacts = [];
+      response.toObject().contactsList.forEach(c => {
+        const newContact = { id: c.id, name: c.name, email: c.email, hasNewMessages: false, numberOfUnreadMessages: 0 }
+        contacts.push(newContact)
+      });
+
       store.commit("user/saveContacts", { contacts: contacts })
       resolve(contacts);
     }))

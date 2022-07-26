@@ -1,7 +1,7 @@
 <template>
   <div :class="isSelf ? 'msgContainer' : 'msgContainer darker'">
     <p :class="isSelf ? 'right' : 'left'">{{ from }}</p>
-    <p>{{ message }}</p>
+    <p v-dompurify-html="message"></p>
     <span :class="isSelf ? 'time-right' : 'time-left'">{{ time }}</span>
   </div>
 </template>

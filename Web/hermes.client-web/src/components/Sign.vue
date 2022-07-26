@@ -127,7 +127,7 @@ export default {
         })
         .then(
             () => {
-              this.$router.push("/about");
+              this.$router.push("/");
             }
           );
       }

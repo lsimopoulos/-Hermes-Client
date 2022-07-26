@@ -10,10 +10,9 @@ export const auth = {
       return new Promise((resolve, reject) => {
         AuthService.login({ email, password })
           .then(response => {
-            commit('loginSuccess', {response, email});
+            commit('loginSuccess', { response, email });
             resolve(response);
           }).catch((err) => {
-            console.log(err);
             commit('loginFailure');
             reject(err);
           })
@@ -25,6 +24,7 @@ export const auth = {
     },
 
     attemptRegister({ commit }, { email, password, name }) {
+
       return new Promise((resolve, reject) => {
         AuthService.register({ email, password, name })
           .then(response => {
@@ -32,13 +32,13 @@ export const auth = {
             resolve(response.data);
           }).catch((error) => {
             commit('registerFailure');
-            reject(error);
+            return reject(error);
           })
       });
     }
   },
   mutations: {
-    loginSuccess(state, {response, email}) {
+    loginSuccess(state, { response, email }) {
       state.status.loggedIn = true;
       state.response_token = response;
       state.status.aliasname = email;

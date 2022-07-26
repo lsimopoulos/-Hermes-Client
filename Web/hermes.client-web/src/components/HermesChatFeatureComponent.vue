@@ -1,73 +1,12 @@
 <template>
-  <div class="container">
-    <ContactsListComponent
-      class="contacts-list"
-      :contacts="contacts"
-      v-model="contacts"
-    />
+  <div class="view-container">
+    <ContactsListComponent :contacts="contacts" v-model="contacts" />
     <ChatWindowComponent
+      class="chat-window"
       v-if="isContactSelected"
       :messages="currentMessages"
       v-model="currentMessages"
     />
-    <button
-      type="button"
-      class="btn btn-primary"
-      data-toggle="modal"
-      data-target="#addContactModal"
-    >
-      Add a contact
-    </button>
-
-    <!-- Modal -->
-    <div
-      class="modal fade"
-      id="addContactModal"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="addContactModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="addContactModalLabel">Add a contact</h5>
-            <button
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <label
-              >Enter the email address of the contact you want to add</label
-            >
-            <input
-              v-model="email"
-              type="email"
-              class="form-control"
-              placeholder="Email"
-            />
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-              id="close"
-            >
-              Close
-            </button>
-            <button type="button" class="btn btn-primary" @click="addContact">
-              Add
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 <script>
@@ -81,21 +20,35 @@
     {
     },
     inject: ['$chatService'],
+  
   mounted()
   {
     this.unsubscribe = this.$store.subscribe((mutation, state) => {
-      var self = this
+      const self = this
       if (mutation.type === 'chat/addChatMessage' ) {
-      const selectContact = self.$store.getters['user/selected_contact'];
-        if( (selectContact!= null && mutation.payload.chatMessage.name !=selectContact.name && mutation.payload.chatMessage.isSelf == false) || selectContact == null){
-           var contact = self.contacts.find((item)=>item.id=== mutation.payload.contactId)
-           if(contact != null)
-              contact.hasNewMessages = true;
+        
+        const selectContact = self.$store.getters['user/selected_contact'];
+        if( (selectContact!= null &&  mutation.payload.chatMessage.name !=selectContact.name && !mutation.payload.chatMessage.isSelf) || selectContact == null){
+           let contact = self.contacts.find((item)=>item.id=== mutation.payload.contactId)
+           if(contact != null){
+            contact.hasNewMessages = true;
+            contact.numberOfUnreadMessages++;
+            }
+              
          }
-
+          for( var i = 0; i < self.contacts.length; i++){ 
+            if ( self.contacts[i] .id=== mutation.payload.contactId && i!= 0) { 
+              let ctt = self.contacts[i];
+              self.contacts.splice(i,1); 
+              self.contacts.splice(1,0,ctt);
+            }
+          }
       }
       if (mutation.type === 'user/setSelectedContact' ) {
         self.currentMessages = state.chat.chats[mutation.payload.contact.id]
+      }
+       if (mutation.type === 'user/addContact' ) {
+        self.contacts.push(mutation.payload.contact)
       }
     })
     this.connect()
@@ -107,45 +60,32 @@
        ChatWindowComponent
     },
      computed: {
-      // mapState(['chat/messages']),
     isContactSelected() {
       return this.$store.getters['user/selected_contact'] != null;
     }
+
    },
     methods : {
       connect () {
         this.$chatService.connect();
       },
-      addContact(){
-        if (this.email != "" ) {
-          this.$chatService.addContact(this.email)
-            .then(response => {
-              const newContact = { id: response.id, name: response.name, email: response.email, hasNewMessages: false}
-              this.contacts.push(newContact);
-              this.$store.commit("chat/initiateChat", { contactId: response.id });
-        })
-        document.getElementById('close').click();
-       }
-   },
    getContacts(){
       this.$chatService.getContacts()
       .then(response => 
       { 
         
         response.forEach(c => {
-          const newContact = { id: c.id, name : c.name, email: c.email, hasNewMessages : false}
           this.$store.commit("chat/initiateChat", { contactId: c.id });
-          this.contacts.push(newContact)
+          this.contacts.push(c)
           });
       })
     }    
    },
     data() {
       return {
-        email: "",
-        contacts: [],
         currentMessages: [],
-        chats:{}
+        chats:{},
+        contacts:[]
       }
     },
      beforeUnmount() {
@@ -154,7 +94,13 @@
   }
 </script>
 <style scoped>
-.contacts-list {
-  float: left;
+.view-container {
+  margin-top: 5px;
+  display: flex;
+  gap: 10px;
+}
+
+.chat-window {
+  margin-top: 5px;
 }
 </style>

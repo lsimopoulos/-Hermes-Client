@@ -8,7 +8,10 @@ export const user = {
     },
     mutations: {
       saveContacts(state, { contacts }) {
-       state.contacts.push(contacts)
+        contacts.forEach(contact => {
+          state.contacts.push(contact)
+        });
+       
       },
       addContact(state, { contact }){
         state.contacts.push(contact)
@@ -21,7 +24,7 @@ export const user = {
       contacts: state => state.contacts,
       selected_contact: state => state.selected_contact,
       getContactIdByEmail: (state) => (email) => {
-        return state.contacts[0].find((item)=>item.name===email)
+        return state.contacts.find((item)=>item.email===email)
       }
     }
   };

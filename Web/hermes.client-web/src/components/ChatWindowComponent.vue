@@ -1,12 +1,14 @@
 <template>
-  <div class="chatcontainer">
-    <div v-for="msg in messages" :key="msg">
-      <ChatMessage
-        :from="msg.name"
-        :time="msg.time"
-        :isSelf="msg.isSelf"
-        :message="msg.message"
-      />
+  <div class="chat-window-container">
+    <div class="chatcontainer">
+      <div v-for="msg in messages" :key="msg">
+        <ChatMessage
+          :from="msg.name"
+          :time="msg.time"
+          :isSelf="msg.isSelf"
+          :message="msg.message"
+        />
+      </div>
     </div>
     <div class="chat-input-area">
       <input
@@ -62,26 +64,33 @@
   }
 </script>
 <style scoped>
+.chat-window-container{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 85vh;
+}
 .chatcontainer {
   padding: 0 20px;
   margin: 0 auto;
-  max-width: 400px;
-  height: 600px;
+  min-height: 90%;
+  height: 90%;
+  width: 100%;
   border: 3px solid #f1f1f1;
-  overflow: scroll;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 .chat-input-area {
-  bottom: 0px;
-  position: absolute;
-  height: 40px;
-  padding: 10px;
+  width: 100%;
+  /* height: 40px; */
+  /* padding: 10px; */
   margin-bottom: 10px;
 }
 .sendmessage-btn {
-  float: right;
 }
 .text-input {
-  float: left;
-  width: 74%;
+  width: 90%;
 }
 </style>
