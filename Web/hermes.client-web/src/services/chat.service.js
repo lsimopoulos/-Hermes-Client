@@ -15,8 +15,8 @@ class ChatService {
   connect() {
     token = store.getters['auth/access_token']
     metadata = { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/grpc-web-text' }
-    var streaming_call = client.connect(new google_protobuf_empty_pb.Empty, metadata)
-    var ref_store = store;
+    const streaming_call = client.connect(new google_protobuf_empty_pb.Empty, metadata)
+    const ref_store = store;
     streaming_call.on('data', function (result) {
       console.log(result)
       const selectedContact = ref_store.getters['user/getContactIdByEmail'](result.getFrom())
@@ -38,9 +38,9 @@ class ChatService {
   replaceURLs(message) {
     if(!message) return;
   /* eslint-disable-next-line */
-    var urlRegex = /(((https?:\/\/)|(www\.))[^\s]+)/g;
+    let urlRegex = /(((https?:\/\/)|(www\.))[^\s]+)/g;
     return message.replace(urlRegex, function (url) {
-      var hyperlink = url;
+      let hyperlink = url;
       /* eslint-disable-next-line */
       if (!hyperlink.match('^https?:\/\/')) {
         hyperlink = 'http://' + hyperlink;
@@ -55,7 +55,7 @@ class ChatService {
 
   addContact(email) {
     if (email != "") {
-      var acr = new addContactRequest()
+      let acr = new addContactRequest()
       acr.setEmail(email);
       return new Promise((resolve, reject) => client.addContact(acr, metadata, function (err, response) {
         if (err) {
@@ -74,11 +74,11 @@ class ChatService {
   }
 
   sendMessage(chatMsg) {
-    var request = new sendRequest();
+    let request = new sendRequest();
     chatMsg = this.replaceURLs(chatMsg)
     request.setMessage(chatMsg)
 
-    var time = this.getNow();
+    const time = this.getNow();
     request.setTime(time);
     const selectedContact = store.getters['user/selected_contact'];
     request.setTo(selectedContact.id);

@@ -23,7 +23,7 @@ class AuthService {
 
   async login({ email, password }) {
     try {
-      var body =
+      const body =
         'username=' +
         encodeURIComponent(email) +
         '&' +
