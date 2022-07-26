@@ -18,10 +18,12 @@
     "jquery": "^3.6.0",
     "sass": "^1.53.0",
     "sass-loader": "^13.0.2",
+    "save": "^2.5.0",
     "vue": "^3.2.37",
     "vue-dompurify-html": "^3.0.0",
     "vue-router": "^4.1.2",
-    "vuex": "^4.0.2"
+    "vuex": "^4.0.2",
+    "vuex-persistedstate": "^4.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.17.9",
