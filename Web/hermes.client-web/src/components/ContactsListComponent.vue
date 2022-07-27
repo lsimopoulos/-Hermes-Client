@@ -104,7 +104,7 @@
       if( this.selectedGuid!=contact.id)
       {
         this.selectedGuid = contact.id;
-         var cnt = this.contacts.find((item)=>item.id=== contact.id)
+         let cnt = this.contacts.find((item)=>item.id=== contact.id)
            if(cnt != null)
            {
             cnt.hasNewMessages = false;
