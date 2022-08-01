@@ -189,5 +189,127 @@ proto.chat.ChatterPromiseClient.prototype.connect =
 };
 
 
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.google.protobuf.Empty,
+ *   !proto.chat.getContactsReply>}
+ */
+const methodDescriptor_Chatter_getContacts = new grpc.web.MethodDescriptor(
+  '/chat.Chatter/getContacts',
+  grpc.web.MethodType.UNARY,
+  google_protobuf_empty_pb.Empty,
+  proto.chat.getContactsReply,
+  /**
+   * @param {!proto.google.protobuf.Empty} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.chat.getContactsReply.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.google.protobuf.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.chat.getContactsReply)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.chat.getContactsReply>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.chat.ChatterClient.prototype.getContacts =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/chat.Chatter/getContacts',
+      request,
+      metadata || {},
+      methodDescriptor_Chatter_getContacts,
+      callback);
+};
+
+
+/**
+ * @param {!proto.google.protobuf.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.chat.getContactsReply>}
+ *     Promise that resolves to the response
+ */
+proto.chat.ChatterPromiseClient.prototype.getContacts =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/chat.Chatter/getContacts',
+      request,
+      metadata || {},
+      methodDescriptor_Chatter_getContacts);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.chat.addContactRequest,
+ *   !proto.chat.contact>}
+ */
+const methodDescriptor_Chatter_addContact = new grpc.web.MethodDescriptor(
+  '/chat.Chatter/addContact',
+  grpc.web.MethodType.UNARY,
+  proto.chat.addContactRequest,
+  proto.chat.contact,
+  /**
+   * @param {!proto.chat.addContactRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.chat.contact.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.chat.addContactRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.chat.contact)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.chat.contact>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.chat.ChatterClient.prototype.addContact =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/chat.Chatter/addContact',
+      request,
+      metadata || {},
+      methodDescriptor_Chatter_addContact,
+      callback);
+};
+
+
+/**
+ * @param {!proto.chat.addContactRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.chat.contact>}
+ *     Promise that resolves to the response
+ */
+proto.chat.ChatterPromiseClient.prototype.addContact =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/chat.Chatter/addContact',
+      request,
+      metadata || {},
+      methodDescriptor_Chatter_addContact);
+};
+
+
 module.exports = proto.chat;
 

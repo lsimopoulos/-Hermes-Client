@@ -55,6 +55,13 @@
                 placeholder="Email"
                 required
               />
+               <input
+                v-model="name"
+                type="text"
+                class="form-control"
+                placeholder="Name"
+                required
+              />
               <input
                 v-model="passwordReg"
                 type="password"
@@ -103,6 +110,7 @@ export default {
       emailReg: "",
       passwordReg: "",
       confirmReg: "",
+      name:"",
       emptyFields: false,
     }
     
@@ -119,7 +127,7 @@ export default {
         })
         .then(
             () => {
-              this.$router.push("/about");
+              this.$router.push("/");
             }
           );
       }
@@ -130,7 +138,8 @@ export default {
       if (
         this.emailReg === "" ||
         this.passwordReg === "" ||
-        this.confirmReg === ""
+        this.confirmReg === "" ||
+        this.name === ""
       ) {
         this.emptyFields = true;
       } else {
@@ -138,6 +147,7 @@ export default {
           .dispatch("auth/attemptRegister", {
             email: this.emailReg,
             password: this.passwordReg,
+            name: this.name
           });
       }
        this.registerActive = false;
