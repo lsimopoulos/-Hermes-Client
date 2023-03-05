@@ -24,7 +24,6 @@ export const auth = {
     },
 
     attemptRegister({ commit }, { email, password, name }) {
-
       return new Promise((resolve, reject) => {
         AuthService.register({ email, password, name })
           .then(response => {

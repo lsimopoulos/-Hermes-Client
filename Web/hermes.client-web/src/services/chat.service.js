@@ -1,4 +1,4 @@
-import { sendRequest, addContactRequest } from '../proto/hermes_pb';
+import { sendRequest, addContactRequest, addGroupRequest, groupMember } from '../proto/hermes_pb';
 import { ChatterClient } from '../proto/hermes_grpc_web_pb';
 import { CallCredentials } from '@grpc/grpc-js/build/src/call-credentials'
 import store from '../store'
@@ -9,35 +9,58 @@ var google_protobuf_empty_pb = require('google-protobuf/google/protobuf/empty_pb
 var token = null;
 var metadata = null;
 const client = new ChatterClient('https://localhost:55556', CallCredentials.createFromPlugin, null);
-
+var streaming_call = null;
+//https://hermes.simopoulos.net:55556 https://localhost:55556
 
 class ChatService {
   connect() {
     token = store.getters['auth/access_token']
     metadata = { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/grpc-web-text' }
-    const streaming_call = client.connect(new google_protobuf_empty_pb.Empty, metadata)
+
+    streaming_call = client.connect(new google_protobuf_empty_pb.Empty, metadata)
     const ref_store = store;
+
     streaming_call.on('data', function (result) {
-      console.log(result)
-      const selectedContact = ref_store.getters['user/getContactIdByEmail'](result.getFrom())
+      const selectedContact =  ref_store.getters['user/getContactIdByEmail'](result.getFrom())
+    
       const msg = { message: result.getMessage(), name: selectedContact.name, time: result.getTime(), isSelf: false }
-      ref_store.commit("chat/addChatMessage", { chatMessage: msg, contactId: selectedContact.id });
+      const gpId = result.getGroupid()
+      ref_store.commit("chat/addChatMessage", { chatMessage: msg, contactId:  gpId ? gpId : selectedContact.id });
     }.bind(this));
 
     streaming_call.on('status', function (status) {
-
+      //display error
       console.log(status.code, status.details, status.metadata);
+      if (status.code > 1)
+        ref_store.commit('auth/loginFailure');
+      streaming_call.cancel();
+    });
+
+    streaming_call.on('error', function (error) {
+      //display error
+      console.log(error);
+
+      streaming_call.cancel();
     });
 
     streaming_call.on("end", () => {
       console.log("Stream ended.");
+      ref_store.commit('auth/loginFailure');
+      client.cancel();
     });
+
+
+
   }
 
+  disconnect() {
+    if (streaming_call)
+      streaming_call.cancel();
+  }
   //code taken https://codepremix.com/detect-urls-in-text-and-create-a-link-in-javascript
   replaceURLs(message) {
-    if(!message) return;
-  /* eslint-disable-next-line */
+    if (!message) return;
+    /* eslint-disable-next-line */
     let urlRegex = /(((https?:\/\/)|(www\.))[^\s]+)/g;
     return message.replace(urlRegex, function (url) {
       let hyperlink = url;
@@ -48,7 +71,7 @@ class ChatService {
       return '<a href="' + hyperlink + '" target="_blank" rel="noopener noreferrer">' + url + '</a>'
     });
   }
-  
+
   getNow() {
     return new Date().toLocaleTimeString(navigator.language, { hour: '2-digit', minute: '2-digit' });
   }
@@ -67,8 +90,30 @@ class ChatService {
         const newContact = { id: contact.id, name: contact.name, email: contact.email, hasNewMessages: false, numberOfUnreadMessages: 0 }
         store.commit("user/addContact", { contact: newContact })
         resolve(contact);
+      }))
+    }
+  }
 
-
+  addGroup(nameOfGroup,members) {
+    if (nameOfGroup != "", members.length > 0) {
+      let agr = new addGroupRequest()
+      agr.setName(nameOfGroup);
+      const mem = [];
+      for (let index = 0; index < members.length; index++) {
+        mem.push(new groupMember().setId(members[index]))
+        
+      }
+      agr.setMembersList(mem);
+      return new Promise((resolve, reject) => client.addGroup(agr, metadata, function (err, response) {
+        if (err) {
+          console.log(err.code);
+          console.log(err.message);
+          return reject(err)
+        }
+        const contact = response.toObject();
+        const newContact = { id: contact.id, name: contact.name, email: contact.email, hasNewMessages: false, numberOfUnreadMessages: 0 }
+        store.commit("user/addContact", { contact: newContact })
+        resolve(contact);
       }))
     }
   }
@@ -113,7 +158,6 @@ class ChatService {
       store.commit("user/saveContacts", { contacts: contacts })
       resolve(contacts);
     }))
-
   }
 }
 export const chatService = new ChatService();

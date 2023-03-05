@@ -2,35 +2,35 @@
   <div class="login-page">
     <div class="wallpaper"></div>
 
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-4 col-md-6 col-sm-8 mx-auto">
+    <div class="container mx-auto sm:px-4">
+      <div class="flex flex-wrap">
+        <div class="lg:w-1/3 pr-4 pl-4 md:w-1/2 pr-4 pl-4 sm:w-2/3 pr-4 pl-4 mx-auto">
           <div
             v-if="!registerActive"
             class="card login"
             v-bind:class="{ error: emptyFields }"
           >
             <h1>Sign In</h1>
-            <form class="form-group" @submit.prevent>
+            <form class="mb-4" @submit.prevent>
               <input
                 v-model="emailLogin"
                 type="email"
-                class="form-control"
+                class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-gray-800 border border-gray-200 rounded"
                 placeholder="Email"
                 required
               />
               <input
                 v-model="passwordLogin"
                 type="password"
-                class="form-control"
+                class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-gray-800 border border-gray-200 rounded"
                 placeholder="Password"
                 required
               />
-              <input type="submit" class="btn btn-primary" @click="doLogin" />
+              <input type="submit" class="inline-block align-middle text-center select-none border font-normal whitespace-no-wrap rounded py-1 px-3 leading-normal no-underline bg-blue-600 text-white hover:bg-blue-600" @click="doLogin" />
               
               <p>
                 Don't have an account?
-                <a
+                <a class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
                   href="#"
                   @click="
                     (registerActive = !registerActive), (emptyFields = false)
@@ -51,39 +51,39 @@
               <input
                 v-model="emailReg"
                 type="email"
-                class="form-control"
+                class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-gray-800 border border-gray-200 rounded"
                 placeholder="Email"
                 required
               />
                <input
                 v-model="name"
                 type="text"
-                class="form-control"
+                class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-gray-800 border border-gray-200 rounded"
                 placeholder="Name"
                 required
               />
               <input
                 v-model="passwordReg"
                 type="password"
-                class="form-control"
+                class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-gray-800 border border-gray-200 rounded"
                 placeholder="Password"
                 required
               />
               <input
                 v-model="confirmReg"
                 type="password"
-                class="form-control"
+                class="block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-gray-800 border border-gray-200 rounded"
                 placeholder="Confirm Password"
                 required
               />
               <input
                 type="submit"
-                class="btn btn-primary"
+                class="inline-block align-middle text-center select-none border font-normal whitespace-no-wrap rounded py-1 px-3 leading-normal no-underline bg-blue-600 text-white hover:bg-blue-600"
                 @click="doRegister"
               />
               <p>
                 Already have an account?
-                <a
+                <a class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
                   href="#"
                   @click="
                     (registerActive = !registerActive), (emptyFields = false)

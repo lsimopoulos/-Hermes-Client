@@ -1,47 +1,46 @@
 <template>
   <div id="app">
-    <nav class="navbar navbar-expand navbar-dark bg-primary">
+    <nav class="relative flex flex-wrap items-center content-between py-3 px-4 flex-no-wrap content-start text-white bg-blue-600">
       <a href="/" class="navbar-icon">
         <img
           src="@/assets/logo.png"
           width="40"
           height="40"
-          class="d-inline-block align-top"
+          class="inline-block align-top"
           alt=""
         />
         Hermes</a
       >
-      <div class="navbar-nav mr-auto">
-        <li class="nav-item">
-          <router-link to="/" class="nav-link">
+      <div class="flex flex-wrap list-reset pl-0 mb-0 mr-auto">
+          <router-link to="/" class="inline-block py-2 px-4 no-underline">
             <font-awesome-icon icon="home" />
             <span class="navbar-icon-text">Home</span>
           </router-link>
-        </li>
-        <li class="nav-item">
-          <router-link to="/about" class="nav-link">
+      
+      
+          <router-link to="/about" class="inline-block py-2 px-4 no-underline">
             <font-awesome-icon icon="info" />
             <span class="navbar-icon-text">About</span>
           </router-link>
-        </li>
+       
       </div>
 
     
 
-      <div v-if="isLoggedIn" class="navbar-nav ml-auto">
-        <li class="nav-item">
-          <a class="nav-link active"  href="javascript:void(0);" @click="logOut">
+      <div v-if="isLoggedIn" class="flex flex-wrap list-reset pl-0 mb-0 ml-auto">
+       
+          <a class="inline-block py-2 px-4 no-underline active"  href="javascript:void(0);" @click="logOut">
             <font-awesome-icon icon="sign-out-alt" /> LogOut
           </a>
-        </li>
+       
       </div>
-        <div v-else class="navbar-nav ml-auto">
-        <li class="nav-item">
-          <router-link to="/sign" class="nav-link">
+        <div v-else class="flex flex-wrap list-reset pl-0 mb-0 ml-auto">
+       
+          <router-link to="/sign" class="inline-block py-2 px-4 no-underline">
             <font-awesome-icon icon="user-plus" />
             <span class="navbar-icon-text">Sign</span>
           </router-link>
-        </li>
+      
       </div>
     </nav>
 
@@ -54,7 +53,7 @@
 <script>
 export default {
   name: "App",
-  
+   inject: ["$chatService"],
    computed: {
     isLoggedIn() {
       return this.$store.state.auth.status.loggedIn;
@@ -64,6 +63,7 @@ export default {
     logOut() {
       this.$store.dispatch('auth/logout');
       this.$router.push('/sign');
+      this.$chatService.disconnect();
     }
   }
 };
