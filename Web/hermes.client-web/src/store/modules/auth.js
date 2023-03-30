@@ -3,7 +3,7 @@ import AuthService from '../../services/auth.service';
 export const auth = {
   namespaced: true,
   state: {
-    status: { loggedIn: false, aliasname: null },
+    status: { loggedIn: false, aliasname: null, user_id : null },
   },
   actions: {
     attemptLogin({ commit }, { email, password }) {
@@ -57,11 +57,15 @@ export const auth = {
     },
     registerFailure(state) {
       state.status.loggedIn = false;
+    },
+    setUserId(state, {userId}) {
+      state.status.user_id = userId;
     }
   },
   getters: {
     access_token: state => state.response_token.access_token,
     refresh_token: state => state.response_token.refresh_token,
-    user_aliasname: state => state.status.aliasname
+    user_aliasname: state => state.status.aliasname,
+    user_id : state => state.status.user_id
   }
 };

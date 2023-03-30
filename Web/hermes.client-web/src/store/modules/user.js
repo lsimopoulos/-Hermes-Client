@@ -32,6 +32,9 @@ export const user = {
     selected_contact: state => state.selected_contact,
     getContactIdByEmail: (state) => (email) => {
       return state.contacts.find((item) => item.email === email)
+    },
+    getContactIdById: (state) => (id) => {
+      return state.contacts.find((item)=>item.id===id)
     }
   }
 };

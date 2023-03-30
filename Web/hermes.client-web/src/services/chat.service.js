@@ -21,8 +21,7 @@ class ChatService {
     const ref_store = store;
 
     streaming_call.on('data', function (result) {
-      const selectedContact =  ref_store.getters['user/getContactIdByEmail'](result.getFrom())
-    
+      const selectedContact = ref_store.getters['user/getContactIdById'](result.getFrom())
       const msg = { message: result.getMessage(), name: selectedContact.name, time: result.getTime(), isSelf: false }
       const gpId = result.getGroupid()
       ref_store.commit("chat/addChatMessage", { chatMessage: msg, contactId:  gpId ? gpId : selectedContact.id });
@@ -89,6 +88,7 @@ class ChatService {
         const contact = response.toObject();
         const newContact = { id: contact.id, name: contact.name, email: contact.email, hasNewMessages: false, numberOfUnreadMessages: 0 }
         store.commit("user/addContact", { contact: newContact })
+        request.setFrom(store.getters['auth/user_id'])
         resolve(contact);
       }))
     }
