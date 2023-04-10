@@ -99,10 +99,7 @@ class ChatService {
       let agr = new addGroupRequest()
       agr.setName(nameOfGroup);
       const mem = [];
-      for (let index = 0; index < members.length; index++) {
-        mem.push(new groupMember().setId(members[index]))
-        
-      }
+      members.forEach((member) => mem.push(new groupMember().setId(member)))
       agr.setMembersList(mem);
       return new Promise((resolve, reject) => client.addGroup(agr, metadata, function (err, response) {
         if (err) {
