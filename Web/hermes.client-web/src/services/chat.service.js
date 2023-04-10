@@ -95,7 +95,7 @@ class ChatService {
   }
 
   addGroup(nameOfGroup,members) {
-    if (nameOfGroup != "", members.length > 0) {
+    if (nameOfGroup && members.length > 0) {
       let agr = new addGroupRequest()
       agr.setName(nameOfGroup);
       const mem = [];
