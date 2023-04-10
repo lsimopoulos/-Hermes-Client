@@ -54,7 +54,7 @@ export default {
         self.unreadMessages = 0;
         for (let index = 0; index < self.contacts.length; index++) {
           if (mutation.payload.contact.id === self.contacts[index].id) {
-            let contact = self.contacts[index];
+            const contact = self.contacts[index];
             self.unreadMessages = contact.numberOfUnreadMessages;
             contact.numberOfUnreadMessages = 0;
             self.contacts.splice(index, 1);
