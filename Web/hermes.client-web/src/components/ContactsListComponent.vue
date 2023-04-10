@@ -208,7 +208,7 @@ export default {
       if (this.selectedGuid != contact.id) {
         this.selectedGuid = contact.id;
         let cnt = this.contacts.find((item) => item.id === contact.id);
-        if (cnt != null) {
+        if (cnt) {
           cnt.hasNewMessages = false;
           // cnt.numberOfUnreadMessages = 0;
         }
