@@ -16,7 +16,7 @@ class AuthService {
     } else {
       errorResponse = error.message;
     }
-    if (errorResponse === '')
+    if (!errorResponse)
       errorResponse = error.message;
     throw new Error(errorResponse);
   }
