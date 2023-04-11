@@ -12,8 +12,8 @@ const store = createStore({
   },
   plugins: [createPersistedState({
     storage: window.sessionStorage,
-    paths: ['auth'],
-})]
+    paths: ['auth','user/selected_contact'],
+  })]
 });
 
 export default store;

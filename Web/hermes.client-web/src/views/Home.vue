@@ -1,9 +1,6 @@
 <template>
 <div>
-
   <ChatComponent v-if="isLoggedIn" /> 
- 
-   
 </div>
 </template>
 <script>

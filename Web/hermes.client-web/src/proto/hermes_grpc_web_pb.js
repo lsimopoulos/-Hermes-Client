@@ -311,5 +311,66 @@ proto.chat.ChatterPromiseClient.prototype.addContact =
 };
 
 
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.chat.addGroupRequest,
+ *   !proto.chat.contact>}
+ */
+const methodDescriptor_Chatter_addGroup = new grpc.web.MethodDescriptor(
+  '/chat.Chatter/addGroup',
+  grpc.web.MethodType.UNARY,
+  proto.chat.addGroupRequest,
+  proto.chat.contact,
+  /**
+   * @param {!proto.chat.addGroupRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.chat.contact.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.chat.addGroupRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.chat.contact)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.chat.contact>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.chat.ChatterClient.prototype.addGroup =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/chat.Chatter/addGroup',
+      request,
+      metadata || {},
+      methodDescriptor_Chatter_addGroup,
+      callback);
+};
+
+
+/**
+ * @param {!proto.chat.addGroupRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.chat.contact>}
+ *     Promise that resolves to the response
+ */
+proto.chat.ChatterPromiseClient.prototype.addGroup =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/chat.Chatter/addGroup',
+      request,
+      metadata || {},
+      methodDescriptor_Chatter_addGroup);
+};
+
+
 module.exports = proto.chat;
 
