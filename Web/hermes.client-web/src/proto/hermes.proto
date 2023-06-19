@@ -5,7 +5,9 @@ package chat;
 // The chatter service definition.
 service Chatter {
 	rpc chat(sendRequest) returns (google.protobuf.Empty);
-	rpc connect(google.protobuf.Empty) returns (stream chatReply);
+	rpc sendIsTyping(chatStatus) returns (google.protobuf.Empty);
+	rpc connectMessages(google.protobuf.Empty) returns (stream chatReply);
+	rpc connectStatus(google.protobuf.Empty) returns (stream chatStatus);
 	rpc getContacts(google.protobuf.Empty) returns (getContactsReply);
 	rpc addContact(addContactRequest) returns (contact);
 	rpc addGroup(addGroupRequest) returns (contact);
@@ -40,6 +42,7 @@ message contact {
 	string name = 2;
 	string email = 3;
 	bool isGroup = 4;
+	bool isOnline = 5;
 }
 message contactsReply {
 	string id =1;
@@ -53,4 +56,11 @@ message addGroupRequest {
 }
 message groupMember {
 	string id =1;
+}
+
+message chatStatus {
+	string from = 1;
+	optional bool isTyping = 2;
+	optional bool isOnline = 3;
+	optional string to = 4;
 }

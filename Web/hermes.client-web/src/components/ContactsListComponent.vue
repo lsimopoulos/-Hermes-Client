@@ -28,7 +28,9 @@
         :name="contact.name"
         :hasNewMessages="contact.hasNewMessages"
         :email="contact.email"
+        :isgroup= "contact.isGroup"
         :numberOfUnreadMessages="contact.numberOfUnreadMessages"
+        :isonline="contact.isonline"
         @click="selectContact(contact)"
       >
       </ContactComponent>
@@ -187,7 +189,7 @@ export default {
   },
    computed: {
     groupContacts() {
-      const filteredContacts = this.contacts.filter(contact => !contact.isGroup);
+      const filteredContacts = this.contacts.filter(contact => !contact.isgroup);
       return filteredContacts.slice(1, filteredContacts.length - 1);
     }
    },

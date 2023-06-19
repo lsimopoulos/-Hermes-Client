@@ -1,40 +1,27 @@
 <template>
   <div class="chat-window-container">
     <div class="chatcontainer" @scroll="onScroll">
-      <div
-        v-for="(msg, index) in currentMessages"
-        :key="index"
-        ref="chat_container"
-        :class="msg.isSelf ?  'my-message' : 'other-message'"
-      >
-        <ChatMessage
-          :from="msg.name"
-          :time="msg.time"
-          :isSelf="msg.isSelf"
-          :message="msg.message"
-        />
+      <div v-for="(msg, index) in currentMessages" :key="index" ref="chat_container"
+        :class="msg.isSelf ? 'my-message' : 'other-message'">
+        <ChatMessage :from="msg.name" :time="msg.time" :isSelf="msg.isSelf" :message="msg.message" />
+
       </div>
-      <button
-        v-if="!isBottom"
-        type="submit"
-        class="btn btn-primary float"
-        @click="scrollToBottom"
-      >
+      <div class="typing-indicator" v-if="otherTyping">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+      <button v-if="!isBottom" type="submit" class="btn btn-primary float" @click="scrollToBottom">
         <font-awesome-icon icon="angle-double-down" />
       </button>
     </div>
+
     <div class="chat-input-area">
-      <input
-        type="text"
-        class="form-control text-input"
-        v-model="chatMsg"
-        v-on:keyup.enter="sendMessage"
-      />
-      <button
-        type="submit"
+      <input type="text" class="form-control text-input" v-model="chatMsg" v-on:keyup.enter="sendMessage"
+        @keypress='handleKeyPressed' />
+      <button type="submit"
         class="inline-block align-middle text-center select-none border font-normal whitespace-no-wrap rounded py-1 px-3 leading-normal no-underline bg-blue-600 text-white hover:bg-blue-600 sendmessage-btn"
-        @click="sendMessage"
-      >
+        @click="sendMessage">
         <font-awesome-icon icon="paper-plane" />
       </button>
     </div>
@@ -49,6 +36,10 @@ export default {
   props: {
     messages: Array,
     unreadMessages: Number,
+  },
+  created() {
+    document.addEventListener('isTypingEvent', this.isTypingEvent);
+    document.addEventListener('messagedAddedEvent', this.messageAddedEvent)
   },
   emits: ["update-unread"],
   computed: {
@@ -66,13 +57,11 @@ export default {
             this.scrollToBottom();
           });
         }
-        else
-        {
-          if (this.isBottom)
-          {
-             this.$nextTick(() => {
-            this.scrollToBottom();
-          });
+        else {
+          if (this.isBottom) {
+            this.$nextTick(() => {
+              this.scrollToBottom();
+            });
           }
         }
       },
@@ -87,12 +76,22 @@ export default {
   methods: {
     sendMessage() {
       if (this.chatMsg) {
+        this.stopMeTyping();
         chatService.sendMessage(this.chatMsg);
         this.chatMsg = "";
 
         this.$nextTick(() => {
           this.scrollToBottom();
         });
+      }
+    },
+    handleKeyPressed() {
+
+      if (!this.meTyping) {
+        this.meTyping = true;
+        const customEvent = new CustomEvent('sendIsTypingEvent', {});
+        document.dispatchEvent(customEvent);
+        this.meTypingTimer = setTimeout(() => this.stopMeTyping(), 5000);
       }
     },
     onScroll(e) {
@@ -125,17 +124,83 @@ export default {
         500
       );
     },
+    messageAddedEvent(event) {
+      const contactId = event.detail;
+      const selected_contact = this.$store.getters["user/selected_contact"];
+      if (selected_contact.id === contactId) {
+        this.otherTyping = false;
+        clearTimeout(this.otherTypingTimer);
+
+      }
+
+    },
+    isTypingEvent(event) {
+      const status = event.detail;
+      const selected_contact = this.$store.getters["user/selected_contact"];
+      if (selected_contact.id === status.from) {
+        if (this.otherTyping) {
+          clearTimeout(this.otherTypingTimer);
+        }
+        this.otherTyping = true;
+        this.otherTypingTimer = setTimeout(() => this.stopOtherTyping(), 5000);
+      }
+
+    },
+    stopMeTyping() {
+      this.meTyping = false;
+
+      clearTimeout(this.meTypingTimer);
+    },
+    stopOtherTyping() {
+      this.otherTyping = false;
+
+      clearTimeout(this.otherTypingTimer);
+    }
   },
   data() {
     return {
       chatMsg: "",
       isBottom: true,
       isScrollingFromCode: false,
+      meTypingTimer: "",
+      metyping: false,
+      otherTypingTimer: "",
+      otherTyping: false
     };
   },
 };
 </script>
 <style scoped>
+.typing-indicator {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 10px;
+  height: 20px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background-color: #ccc;
+  border-radius: 50%;
+  margin-right: 4px;
+  animation: dot-pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes dot-pulse {
+
+  0%,
+  40%,
+  100% {
+    opacity: 0.3;
+  }
+
+  20% {
+    opacity: 1;
+  }
+}
+
 .chat-window-container {
   display: flex;
   flex-direction: column;
@@ -143,6 +208,7 @@ export default {
   width: 100%;
   height: 90vh;
 }
+
 .chatcontainer {
   padding: 0 20px;
   margin: 0 auto;
@@ -153,18 +219,22 @@ export default {
   display: flex;
   flex-direction: column;
 }
+
 .chat-input-area {
   width: 100%;
   margin-bottom: 10px;
   display: flex;
   gap: 10px;
 }
+
 .sendmessage-btn {
   border-radius: 50%;
 }
+
 .text-input {
   width: 90%;
 }
+
 .float {
   position: fixed;
   width: 40px;
@@ -175,12 +245,14 @@ export default {
   text-align: center;
   box-shadow: 2px 2px 3px #999;
 }
+
 .my-message {
   display: flex;
   justify-content: flex-end;
 }
+
 .other-message {
-   display: flex;
+  display: flex;
   justify-content: flex-start;
 }
 </style>

@@ -1,14 +1,8 @@
 <template>
   <div class="view-container">
     <ContactsListComponent :contacts="contacts" v-model="contacts" />
-    <ChatWindowComponent
-      class="chat-window"
-      v-if="isContactSelected"
-      :messages="currentMessages"
-      :unreadMessages="unreadMessages"
-      v-model="currentMessages"
-      @update-unread="updateUnreadMessages"
-    />
+    <ChatWindowComponent class="chat-window" v-if="isContactSelected" :messages="currentMessages"
+      :unreadMessages="unreadMessages" v-model="currentMessages" @update-unread="updateUnreadMessages" />
   </div>
 </template>
 <script>
@@ -17,9 +11,11 @@ import ChatWindowComponent from "./ChatWindowComponent.vue";
 
 export default {
   name: "HermesChatFeatureComponent",
-  setup() {},
+  setup() { },
   inject: ["$chatService"],
-  // emits: ["update-unread"],
+  created() {
+    document.addEventListener('updateStatusEvent', this.updateStatusEvent);
+  },
   mounted() {
     this.unsubscribe = this.$store.subscribe((mutation, state) => {
       const self = this;
@@ -44,7 +40,7 @@ export default {
             ) {
               self.unreadMessages = self.unreadMessages + 1;
             }
-              self.contacts.splice(i, 1);
+            self.contacts.splice(i, 1);
             self.contacts.splice(1, 0, ctt);
           }
         }
@@ -93,6 +89,15 @@ export default {
           this.contacts.push(c);
         });
       });
+    },
+    updateStatusEvent(event) {
+      const status = event.detail;
+      console.log(status);
+      for (let index = 0; index < this.contacts.length; index++) {
+        if (status.from === this.contacts[index].id &&  !this.contacts[index].isGroup) {
+          this.contacts[index].isonline = status.isonline;
+        }
+      }
     },
   },
   data() {
