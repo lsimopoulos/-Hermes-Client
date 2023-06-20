@@ -1,4 +1,4 @@
-import { sendRequest, addContactRequest, addGroupRequest, groupMember } from '../proto/hermes_pb';
+import { sendRequest, addContactRequest, addGroupRequest, groupMember, chatStatus, sendIsTyping } from '../proto/hermes_pb';
 import { ChatterClient } from '../proto/hermes_grpc_web_pb';
 import { CallCredentials } from '@grpc/grpc-js/build/src/call-credentials'
 import store from '../store'
@@ -9,52 +9,98 @@ var google_protobuf_empty_pb = require('google-protobuf/google/protobuf/empty_pb
 var token = null;
 var metadata = null;
 const client = new ChatterClient('https://localhost:55556', CallCredentials.createFromPlugin, null);
-var streaming_call = null;
+let messages_streaming_call = null;
+let status_streaming_call = null;
 //https://hermes.simopoulos.net:55556 https://localhost:55556
 
 class ChatService {
   connect() {
+
     token = store.getters['auth/access_token']
     metadata = { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/grpc-web-text' }
+    document.addEventListener('sendIsTypingEvent', this.sendIsTyping);
+    messages_streaming_call = client.connectMessages(new google_protobuf_empty_pb.Empty, metadata);
+    status_streaming_call = client.connectStatus(new google_protobuf_empty_pb.Empty, metadata)
 
-    streaming_call = client.connect(new google_protobuf_empty_pb.Empty, metadata)
     const ref_store = store;
-
-    streaming_call.on('data', function (result) {
+    //streaming call for messages
+    messages_streaming_call.on('data', function (result) {
       const selectedContact = ref_store.getters['user/getContactIdById'](result.getFrom())
       const msg = { message: result.getMessage(), name: selectedContact.name, time: result.getTime(), isSelf: false }
       const gpId = result.getGroupid()
-      ref_store.commit("chat/addChatMessage", { chatMessage: msg, contactId:  gpId ? gpId : selectedContact.id });
+      ref_store.commit("chat/addChatMessage", { chatMessage: msg, contactId: gpId ? gpId : selectedContact.id });
     }.bind(this));
 
-    streaming_call.on('status', function (status) {
+    messages_streaming_call.on('status', function (status) {
       //display error
       console.log(status.code, status.details, status.metadata);
       if (status.code > 1)
         ref_store.commit('auth/loginFailure');
-      streaming_call.cancel();
+      messages_streaming_call.cancel();
     });
 
-    streaming_call.on('error', function (error) {
+    messages_streaming_call.on('error', function (error) {
       //display error
       console.log(error);
 
-      streaming_call.cancel();
+      messages_streaming_call.cancel();
     });
 
-    streaming_call.on("end", () => {
+    messages_streaming_call.on("end", () => {
+      console.log("Stream ended.");
+      ref_store.commit('auth/loginFailure');
+      client.cancel();
+    });
+
+    //streaming call for status
+    status_streaming_call.on('data', function (result) {
+      const status =  result.toObject();
+      let customEvent;
+      if(status.isonline && status.istyping){
+        customEvent = new CustomEvent('isTypingEvent', {
+          detail: status,
+        });
+      }
+      else{
+        customEvent = new CustomEvent('updateStatusEvent', {
+          detail: status,
+        });
+      }
+     
+      document.dispatchEvent(customEvent);
+    }.bind(this));
+
+    messages_streaming_call.on('status', function (status) {
+      //display error
+      console.log(status.code, status.details, status.metadata);
+      if (status.code > 1)
+        ref_store.commit('auth/loginFailure');
+      status_streaming_call.cancel();
+    });
+
+    messages_streaming_call.on('error', function (error) {
+      //display error
+      console.log(error);
+
+      status_streaming_call.cancel();
+    });
+
+    messages_streaming_call.on("end", () => {
       console.log("Stream ended.");
       ref_store.commit('auth/loginFailure');
       client.cancel();
     });
 
 
-
   }
 
   disconnect() {
-    if (streaming_call)
-      streaming_call.cancel();
+    if (messages_streaming_call)
+      messages_streaming_call.cancel();
+    if (status_streaming_call)
+      status_streaming_call.cancel();
+
+    document.removeEventListener('sendIsTypingEvent', this.sendIsTyping);
   }
   //code taken https://codepremix.com/detect-urls-in-text-and-create-a-link-in-javascript
   replaceURLs(message) {
@@ -86,7 +132,7 @@ class ChatService {
           return reject(err)
         }
         const contact = response.toObject();
-        const newContact = { id: contact.id, name: contact.name, email: contact.email, hasNewMessages: false, numberOfUnreadMessages: 0 }
+        const newContact = { id: contact.id, name: contact.name, email: contact.email, hasNewMessages: false, numberOfUnreadMessages: 0, isGroup: false, isonline: contact.isonline }
         store.commit("user/addContact", { contact: newContact })
         request.setFrom(store.getters['auth/user_id'])
         resolve(contact);
@@ -94,7 +140,7 @@ class ChatService {
     }
   }
 
-  addGroup(nameOfGroup,members) {
+  addGroup(nameOfGroup, members) {
     if (nameOfGroup && members.length > 0) {
       let agr = new addGroupRequest()
       agr.setName(nameOfGroup);
@@ -108,7 +154,7 @@ class ChatService {
           return reject(err)
         }
         const contact = response.toObject();
-        const newContact = { id: contact.id, name: contact.name, email: contact.email, hasNewMessages: false, numberOfUnreadMessages: 0 }
+        const newContact = { id: contact.id, name: contact.name, email: contact.email, hasNewMessages: false, numberOfUnreadMessages: 0, isGroup: true }
         store.commit("user/addContact", { contact: newContact })
         resolve(contact);
       }))
@@ -124,7 +170,7 @@ class ChatService {
     request.setTime(time);
     const selectedContact = store.getters['user/selected_contact'];
     request.setTo(selectedContact.id);
-    request.setFrom(store.getters['auth/user_aliasname']);
+    request.setFrom(store.getters['auth/user_id']);
     if (chatMsg) {
       const msg = { message: chatMsg, name: "Me:", time: time, isSelf: true }
       store.commit("chat/addChatMessage", { chatMessage: msg, contactId: selectedContact.id });
@@ -141,6 +187,24 @@ class ChatService {
 
   }
 
+  sendIsTyping() {
+    let cs = new chatStatus();
+    cs.setFrom(store.getters['auth/user_id']);
+    cs.setIstyping(true);
+    cs.setIsonline(true);
+    const selectedContact = store.getters['user/selected_contact'];
+    if (selectedContact.isonline) {
+      cs.setTo(selectedContact.id);
+      client.sendIsTyping(cs, metadata, function (err) {
+        if (err) {
+          console.log(err.code);
+          console.log(err.message);
+        }
+      });
+    }
+
+  }
+
   getContacts() {
     return new Promise((resolve, reject) => client.getContacts(new google_protobuf_empty_pb.Empty, metadata, function (err, response) {
       if (err) {
@@ -148,9 +212,12 @@ class ChatService {
       }
       let contacts = [];
       response.toObject().contactsList.forEach(c => {
-        const newContact = { id: c.id, name: c.name, email: c.email, hasNewMessages: false, numberOfUnreadMessages: 0 }
+        const newContact = { id: c.id, name: c.name, email: c.email, hasNewMessages: false, numberOfUnreadMessages: 0, isonline: c.isonline, isTyping: false, isGroup: c.isgroup }
         contacts.push(newContact)
       });
+      store.dispatch("auth/setUserId", {
+        userId: contacts[0].id
+      })
 
       store.commit("user/saveContacts", { contacts: contacts })
       resolve(contacts);

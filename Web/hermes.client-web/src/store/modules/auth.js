@@ -22,7 +22,9 @@ export const auth = {
     logout({ commit }) {
       commit('logout');
     },
-
+    setUserId({ commit }, {userId}) {
+     commit('setUserId',{userId});
+    },
     attemptRegister({ commit }, { email, password, name }) {
       return new Promise((resolve, reject) => {
         AuthService.register({ email, password, name })
@@ -58,9 +60,10 @@ export const auth = {
     registerFailure(state) {
       state.status.loggedIn = false;
     },
-    setUserId(state, {userId}) {
+    setUserId(state, {userId}){
       state.status.user_id = userId;
     }
+    
   },
   getters: {
     access_token: state => state.response_token.access_token,
