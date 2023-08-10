@@ -12,7 +12,7 @@ export const chat = {
     },
     addChatMessage(state, { chatMessage, contactId }) {
       state.chats[contactId].push(chatMessage);
-      let ce = new CustomEvent( 'messagedAddedEvent', { detail : contactId});
+      let ce = new CustomEvent('messagedAddedEvent', { detail: { id: contactId, chatMessage: chatMessage } });
       document.dispatchEvent(ce);
     },
   },
