@@ -39,7 +39,8 @@ export default {
   },
   created() {
     document.addEventListener('isTypingEvent', this.isTypingEvent);
-    document.addEventListener('messagedAddedEvent', this.messageAddedEvent)
+    document.addEventListener('messagedAddedEvent', this.messageAddedEvent);
+    document.addEventListener('changeChatContentEvent', this.handleChangeOfChatContentEvent);
   },
   emits: ["update-unread"],
   computed: {
@@ -47,26 +48,6 @@ export default {
       get() {
         return this.messages;
       },
-    },
-  },
-  watch: {
-    currentMessages: {
-      handler(newVal, oldVal) {
-        if (newVal && oldVal && newVal[0] != oldVal[0]) {
-          this.$nextTick(() => {
-            this.scrollToBottom();
-          });
-        }
-        else {
-          if (this.isBottom) {
-            this.$nextTick(() => {
-              this.scrollToBottom();
-            });
-          }
-        }
-      },
-      immediate: true,
-      deep: true,
     },
   },
   components: {
@@ -80,6 +61,13 @@ export default {
         chatService.sendMessage(this.chatMsg);
         this.chatMsg = "";
 
+        this.$nextTick(() => {
+          this.scrollToBottom();
+        });
+      }
+    },
+    handleChangeOfChatContentEvent(event) {
+      if (event.detail.sourceChanged || (this.isBottom && event.detail.newMessage)) {
         this.$nextTick(() => {
           this.scrollToBottom();
         });
@@ -125,7 +113,7 @@ export default {
       );
     },
     messageAddedEvent(event) {
-      const contactId = event.detail;
+      const contactId = event.detail.id;
       const selected_contact = this.$store.getters["user/selected_contact"];
       if (selected_contact.id === contactId) {
         this.otherTyping = false;
@@ -156,6 +144,11 @@ export default {
 
       clearTimeout(this.otherTypingTimer);
     }
+  },
+  beforeUnmount() {
+    document.removeEventListener('isTypingEvent', this.isTypingEvent);
+    document.removeEventListener('messagedAddedEvent', this.messageAddedEvent);
+    document.removeEventListener('changeChatContentEvent', this.handleChangeOfChatContentEvent);
   },
   data() {
     return {

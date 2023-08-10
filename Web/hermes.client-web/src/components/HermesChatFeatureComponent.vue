@@ -8,6 +8,7 @@
 <script>
 import ContactsListComponent from "./ContactsListComponent.vue";
 import ChatWindowComponent from "./ChatWindowComponent.vue";
+import { mapState } from 'vuex'
 
 export default {
   name: "HermesChatFeatureComponent",
@@ -15,53 +16,11 @@ export default {
   inject: ["$chatService"],
   created() {
     document.addEventListener('updateStatusEvent', this.updateStatusEvent);
+    document.addEventListener('messagedAddedEvent', this.messageAddedEvent)
+    document.addEventListener('setSelectedContactEvent', this.setSelectedContactEvent);
+    document.addEventListener('addContactEvent', this.addContactEvent);
   },
   mounted() {
-    this.unsubscribe = this.$store.subscribe((mutation, state) => {
-      const self = this;
-      if (mutation.type === "chat/addChatMessage") {
-        const selectContact = self.$store.getters["user/selected_contact"];
-
-        for (var i = 0; i < self.contacts.length; i++) {
-          if (self.contacts[i].id === mutation.payload.contactId && i != 0) {
-            let ctt = self.contacts[i];
-            if (
-              (selectContact != null &&
-                mutation.payload.chatMessage.name != selectContact.name &&
-                !mutation.payload.chatMessage.isSelf) ||
-              selectContact == null
-            ) {
-              ctt.hasNewMessages = true;
-              ctt.numberOfUnreadMessages++;
-            } else if (
-              selectContact &&
-              mutation.payload.chatMessage.name == selectContact.name &&
-              !mutation.payload.chatMessage.isSelf
-            ) {
-              self.unreadMessages = self.unreadMessages + 1;
-            }
-            self.contacts.splice(i, 1);
-            self.contacts.splice(1, 0, ctt);
-          }
-        }
-      }
-      if (mutation.type === "user/setSelectedContact") {
-        self.currentMessages = state.chat.chats[mutation.payload.contact.id];
-        self.unreadMessages = 0;
-        for (let index = 0; index < self.contacts.length; index++) {
-          if (mutation.payload.contact.id === self.contacts[index].id) {
-            const contact = self.contacts[index];
-            self.unreadMessages = contact.numberOfUnreadMessages;
-            contact.numberOfUnreadMessages = 0;
-            self.contacts.splice(index, 1);
-            self.contacts.splice(index, 0, contact);
-          }
-        }
-      }
-      if (mutation.type === "user/addContact") {
-        self.contacts.push(mutation.payload.contact);
-      }
-    });
     this.connect();
     this.getContacts();
   },
@@ -71,9 +30,12 @@ export default {
     ChatWindowComponent,
   },
   computed: {
-    isContactSelected() {
-      return this.$store.getters["user/selected_contact"] != null;
-    },
+    ...mapState('user', {
+      isContactSelected: state => state.selected_contact !== null
+    }),
+    ...mapState('chat', {
+      chats: state => state.chats
+    })
   },
   methods: {
     connect() {
@@ -94,23 +56,83 @@ export default {
       const status = event.detail;
       console.log(status);
       for (let index = 0; index < this.contacts.length; index++) {
-        if (status.from === this.contacts[index].id &&  !this.contacts[index].isGroup) {
+        if (status.from === this.contacts[index].id && !this.contacts[index].isGroup) {
           this.contacts[index].isonline = status.isonline;
         }
       }
     },
+    messageAddedEvent(event) {
+      const selectContact = this.$store.getters["user/selected_contact"];
+
+      for (var i = 0; i < this.contacts.length; i++) {
+        if (this.contacts[i].id === event.detail.id && i != 0) {
+          let ctt = this.contacts[i];
+          if (
+            (selectContact != null &&
+              event.detail.chatMessage.name != selectContact.name &&
+              !event.detail.chatMessage.isSelf) ||
+            selectContact == null) {
+            ctt.hasNewMessages = true;
+            ctt.numberOfUnreadMessages++;
+          } else if (
+            selectContact &&
+            event.detail.chatMessage.name == selectContact.name &&
+            !event.detail.chatMessage.isSelf
+          ) {
+            this.unreadMessages = this.unreadMessages + 1;
+            const event = new CustomEvent('changeChatContentEvent', {
+              detail: {
+                sourceChanged: false,
+                newMessage: true
+              }
+            });
+            document.dispatchEvent(event);
+          }
+          this.contacts.splice(i, 1);
+          this.contacts.splice(1, 0, ctt);
+        }
+      }
+
+    },
+    addContactEvent(event) {
+      this.contacts.push(event.detail.contact);
+    },
+    setSelectedContactEvent(event) {
+      if (this.chats[event.detail.contact.id][0] !== this.currentMessages[0]) {
+        const event = new CustomEvent('changeChatContentEvent', {
+          detail: {
+            sourceChanged: true,
+            newMessage: false
+          }
+        });
+        document.dispatchEvent(event);
+      }
+      this.currentMessages = this.chats[event.detail.contact.id];
+      this.unreadMessages = 0;
+      for (let index = 0; index < this.contacts.length; index++) {
+        if (event.detail.contact.id === this.contacts[index].id) {
+          const contact = this.contacts[index];
+          this.unreadMessages = contact.numberOfUnreadMessages;
+          contact.numberOfUnreadMessages = 0;
+          this.contacts.splice(index, 1);
+          this.contacts.splice(index, 0, contact);
+        }
+      }
+    }
+  },
+  beforeUnmount() {
+    document.removeEventListener('updateStatusEvent', this.updateStatusEvent);
+    document.removeEventListener('messagedAddedEvent', this.messageAddedEvent)
+    document.removeEventListener('setSelectedContactEvent', this.setSelectedContactEvent);
+    document.removeEventListener('addContactEvent', this.addContactEvent);
   },
   data() {
     return {
       currentMessages: [],
-      chats: {},
       contacts: [],
       unreadMessages: 0,
     };
-  },
-  beforeUnmount() {
-    this.unsubscribe();
-  },
+  }
 };
 </script>
 <style scoped>

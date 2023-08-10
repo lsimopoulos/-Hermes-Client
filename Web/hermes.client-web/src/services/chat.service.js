@@ -54,19 +54,19 @@ class ChatService {
 
     //streaming call for status
     status_streaming_call.on('data', function (result) {
-      const status =  result.toObject();
+      const status = result.toObject();
       let customEvent;
-      if(status.isonline && status.istyping){
+      if (status.isonline && status.istyping) {
         customEvent = new CustomEvent('isTypingEvent', {
           detail: status,
         });
       }
-      else{
+      else {
         customEvent = new CustomEvent('updateStatusEvent', {
           detail: status,
         });
       }
-     
+
       document.dispatchEvent(customEvent);
     }.bind(this));
 
@@ -118,7 +118,13 @@ class ChatService {
   }
 
   getNow() {
-    return new Date().toLocaleTimeString(navigator.language, { hour: '2-digit', minute: '2-digit' });
+    const now = new Date();
+
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const seconds = now.getSeconds().toString().padStart(2, '0');
+
+    return `${hours}:${minutes}:${seconds}`;
   }
 
   addContact(email) {
@@ -133,7 +139,13 @@ class ChatService {
         }
         const contact = response.toObject();
         const newContact = { id: contact.id, name: contact.name, email: contact.email, hasNewMessages: false, numberOfUnreadMessages: 0, isGroup: false, isonline: contact.isonline }
-        store.commit("user/addContact", { contact: newContact })
+        store.commit("user/addContact", { contact: newContact });
+        let customEvent = new CustomEvent('addContactEvent', {
+          detail: { contact: newContact },
+        });
+
+        document.dispatchEvent(customEvent);
+
         request.setFrom(store.getters['auth/user_id'])
         resolve(contact);
       }))
@@ -156,6 +168,11 @@ class ChatService {
         const contact = response.toObject();
         const newContact = { id: contact.id, name: contact.name, email: contact.email, hasNewMessages: false, numberOfUnreadMessages: 0, isGroup: true }
         store.commit("user/addContact", { contact: newContact })
+        let customEvent = new CustomEvent('addContactEvent', {
+          detail: { contact: newContact },
+        });
+
+        document.dispatchEvent(customEvent);
         resolve(contact);
       }))
     }
