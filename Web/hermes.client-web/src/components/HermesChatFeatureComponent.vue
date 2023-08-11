@@ -2,7 +2,7 @@
   <div class="view-container">
     <ContactsListComponent :contacts="contacts" v-model="contacts" />
     <ChatWindowComponent class="chat-window" v-if="isContactSelected" :messages="currentMessages"
-      :unreadMessages="unreadMessages" v-model="currentMessages" @update-unread="updateUnreadMessages" />
+      :unreadMessages="unreadMessages" v-model="currentMessages" @update-unread="updateUnreadMessages" :contactName="contactName" />
   </div>
 </template>
 <script>
@@ -74,6 +74,9 @@ export default {
     isContactSelected() {
       return this.$store.getters["user/selected_contact"] != null;
     },
+    contactName(){
+      return this.$store.getters["user/selected_contact"].name;
+    }
   },
   methods: {
     connect() {

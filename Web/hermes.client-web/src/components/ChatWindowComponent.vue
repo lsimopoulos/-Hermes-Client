@@ -1,6 +1,17 @@
 <template>
   <div class="chat-window-container">
+    <div class="chat-header">
+      <div class="contact-info">
+        <span class="contact-name">{{ contactName }}</span>
+        <!-- Add other buttons or elements here -->
+        <button class="history-button" @click="makeCall">
+          <font-awesome-icon icon="history"/>
+        </button>
+        <!-- Add more buttons as needed -->
+      </div>
+    </div>
     <div class="chatcontainer" @scroll="onScroll">
+ 
       <div v-for="(msg, index) in currentMessages" :key="index" ref="chat_container"
         :class="msg.isSelf ? 'my-message' : 'other-message'">
         <ChatMessage :from="msg.name" :time="msg.time" :isSelf="msg.isSelf" :message="msg.message" />
@@ -36,6 +47,7 @@ export default {
   props: {
     messages: Array,
     unreadMessages: Number,
+    contactName: String,
   },
   created() {
     document.addEventListener('isTypingEvent', this.isTypingEvent);
@@ -255,4 +267,18 @@ export default {
   display: flex;
   justify-content: flex-start;
 }
+
+.chat-header {
+  background-color: #0074e4; /* Set your preferred background color */
+  color: white; /* Set font color */
+  padding: 10px 20px; /* Adjust padding as needed */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header-icons {
+  display: flex;
+  gap: 10px; /* Adjust spacing between icons */
+}
+
 </style>
