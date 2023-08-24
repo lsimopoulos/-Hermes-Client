@@ -1,17 +1,17 @@
 <template>
-  <div class="chat-window-container">
+  <div class="chat-window-container" v-if="contactName">
     <div class="chat-header">
       <div class="contact-info">
         <span class="contact-name">{{ contactName }}</span>
-        <!-- Add other buttons or elements here -->
-        <button class="history-button" @click="makeCall">
-          <font-awesome-icon icon="history"/>
+      </div>
+      <div class="header-icons">
+        <button class="history-button" @click="fetchOldMessages" :disabled="fetchedAllHistoryMessages">
+          <font-awesome-icon icon="history" />
         </button>
-        <!-- Add more buttons as needed -->
       </div>
     </div>
     <div class="chatcontainer" @scroll="onScroll">
- 
+
       <div v-for="(msg, index) in currentMessages" :key="index" ref="chat_container"
         :class="msg.isSelf ? 'my-message' : 'other-message'">
         <ChatMessage :from="msg.name" :time="msg.time" :isSelf="msg.isSelf" :message="msg.message" />
@@ -47,11 +47,13 @@ export default {
   props: {
     messages: Array,
     unreadMessages: Number,
-    contactName: String,
+    contactName: String
   },
   created() {
     document.addEventListener('isTypingEvent', this.isTypingEvent);
-    document.addEventListener('messagedAddedEvent', this.messageAddedEvent)
+    document.addEventListener('messagedAddedEvent', this.messageAddedEvent);
+    document.addEventListener('changeChatContentEvent', this.handleChangeOfChatContentEvent);
+
   },
   emits: ["update-unread"],
   computed: {
@@ -59,33 +61,51 @@ export default {
       get() {
         return this.messages;
       },
-    },
-  },
-  watch: {
-    currentMessages: {
-      handler(newVal, oldVal) {
-        if (newVal && oldVal && newVal[0] != oldVal[0]) {
-          this.$nextTick(() => {
-            this.scrollToBottom();
-          });
-        }
-        else {
-          if (this.isBottom) {
-            this.$nextTick(() => {
-              this.scrollToBottom();
-            });
-          }
-        }
-      },
-      immediate: true,
-      deep: true,
-    },
+    }
   },
   components: {
     // eslint-disable-next-line
     ChatMessage,
   },
   methods: {
+    fetchOldMessages() {
+      let id = this.$store.getters['auth/user_id'];
+      let self = this;
+      if (this.messages.length > 0) {
+        let argId;
+        if (this.messages[0].id !== this.lastMessageId) {
+          argId = this.messages[0].id;
+        } else {
+          argId = this.lastMessageId;
+        }
+
+        chatService.fetchOldMessages(argId).then((response) => {
+          self.lastMessageId = response.lastid;
+          if (self.lastMessageId === "") {
+            self.fetchedAllHistoryMessages = true;
+          }
+          response.messages.forEach((c) => {
+            self.messages.splice(0, 0, this.updateMessageIfSelf(c, id));
+          });
+        });
+      }
+      else {
+        this.lastMessageId = "";
+        chatService.fetchOldMessages().then((response) => {
+          this.lastMessageId = response.lastid;
+          console.log(this.lastMessageId);
+          response.messages.forEach((c) => {
+            self.messages.splice(0, 0, this.updateMessageIfSelf(c, id));
+          });
+        });
+      }
+    },
+    updateMessageIfSelf(message, id) {
+      if (message.from === id) {
+        message.isSelf = true;
+      }
+      return message;
+    },
     sendMessage() {
       if (this.chatMsg) {
         this.stopMeTyping();
@@ -97,8 +117,15 @@ export default {
         });
       }
     },
+    handleChangeOfChatContentEvent(event) {
+   
+      if (event.detail.sourceChanged || (this.isBottom && event.detail.newMessage)) {
+        this.$nextTick(() => {
+          this.scrollToBottom();
+        });
+      }
+    },
     handleKeyPressed() {
-
       if (!this.meTyping) {
         this.meTyping = true;
         const customEvent = new CustomEvent('sendIsTypingEvent', {});
@@ -137,14 +164,12 @@ export default {
       );
     },
     messageAddedEvent(event) {
-      const contactId = event.detail;
+      const contactId = event.detail.id;
       const selected_contact = this.$store.getters["user/selected_contact"];
       if (selected_contact.id === contactId) {
         this.otherTyping = false;
         clearTimeout(this.otherTypingTimer);
-
       }
-
     },
     isTypingEvent(event) {
       const status = event.detail;
@@ -156,7 +181,6 @@ export default {
         this.otherTyping = true;
         this.otherTypingTimer = setTimeout(() => this.stopOtherTyping(), 5000);
       }
-
     },
     stopMeTyping() {
       this.meTyping = false;
@@ -165,9 +189,13 @@ export default {
     },
     stopOtherTyping() {
       this.otherTyping = false;
-
       clearTimeout(this.otherTypingTimer);
     }
+  },
+  beforeUnmount() {
+    document.removeEventListener('isTypingEvent', this.isTypingEvent);
+    document.removeEventListener('messagedAddedEvent', this.messageAddedEvent);
+    document.removeEventListener('changeChatContentEvent', this.handleChangeOfChatContentEvent);
   },
   data() {
     return {
@@ -177,7 +205,9 @@ export default {
       meTypingTimer: "",
       metyping: false,
       otherTypingTimer: "",
-      otherTyping: false
+      otherTyping: false,
+      lastMessageId: null,
+      fetchedAllHistoryMessages: false
     };
   },
 };
@@ -269,16 +299,17 @@ export default {
 }
 
 .chat-header {
-  background-color: #0074e4; /* Set your preferred background color */
-  color: white; /* Set font color */
-  padding: 10px 20px; /* Adjust padding as needed */
+  background-color: #d1d7db;
+  color: white;
+  padding: 10px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 .header-icons {
   display: flex;
-  gap: 10px; /* Adjust spacing between icons */
+  gap: 10px;
+  margin-left: auto;
 }
-
 </style>

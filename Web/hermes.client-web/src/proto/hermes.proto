@@ -11,6 +11,7 @@ service Chatter {
 	rpc getContacts(google.protobuf.Empty) returns (getContactsReply);
 	rpc addContact(addContactRequest) returns (contact);
 	rpc addGroup(addGroupRequest) returns (contact);
+	rpc historyMessages(historyMessagesRequest) returns (historyMessagesResponse);
 }
 
 message sendRequest {
@@ -23,11 +24,12 @@ message sendRequest {
 
 // The response message containing the message.
 message chatReply {
-	string message = 1;
-	string time = 2;
-	string from = 3;
-	string to = 4;
-	optional string groupid = 5;
+	int32 id = 1;
+	string message = 2;
+	string time = 3;
+	string from = 4;
+	string to = 5;
+	optional string groupid = 6;
 }
 
 message getContactsReply {
@@ -63,4 +65,16 @@ message chatStatus {
 	optional bool isTyping = 2;
 	optional bool isOnline = 3;
 	optional string to = 4;
+}
+message historyMessagesRequest {
+	string contactId = 1;
+ // optional int32 page_size = 2 ;
+  //optional string page_token = 3;
+  optional int32 page_lastid = 2;
+}
+
+message historyMessagesResponse {
+  
+  repeated chatReply messages = 1;
+  string next_page_token = 2;
 }

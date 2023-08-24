@@ -12,7 +12,7 @@ const store = createStore({
   },
   plugins: [createPersistedState({
     storage: window.sessionStorage,
-    paths: ['auth','user/selected_contact'],
+    paths: ['auth','user/selected_contact','chat'],
   })]
 });
 

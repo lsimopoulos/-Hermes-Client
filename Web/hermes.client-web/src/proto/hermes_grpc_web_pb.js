@@ -493,5 +493,66 @@ proto.chat.ChatterPromiseClient.prototype.addGroup =
 };
 
 
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.chat.historyMessagesRequest,
+ *   !proto.chat.historyMessagesResponse>}
+ */
+const methodDescriptor_Chatter_historyMessages = new grpc.web.MethodDescriptor(
+  '/chat.Chatter/historyMessages',
+  grpc.web.MethodType.UNARY,
+  proto.chat.historyMessagesRequest,
+  proto.chat.historyMessagesResponse,
+  /**
+   * @param {!proto.chat.historyMessagesRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.chat.historyMessagesResponse.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.chat.historyMessagesRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.chat.historyMessagesResponse)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.chat.historyMessagesResponse>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.chat.ChatterClient.prototype.historyMessages =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/chat.Chatter/historyMessages',
+      request,
+      metadata || {},
+      methodDescriptor_Chatter_historyMessages,
+      callback);
+};
+
+
+/**
+ * @param {!proto.chat.historyMessagesRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.chat.historyMessagesResponse>}
+ *     Promise that resolves to the response
+ */
+proto.chat.ChatterPromiseClient.prototype.historyMessages =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/chat.Chatter/historyMessages',
+      request,
+      metadata || {},
+      methodDescriptor_Chatter_historyMessages);
+};
+
+
 module.exports = proto.chat;
 
