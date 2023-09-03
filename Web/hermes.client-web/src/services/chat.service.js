@@ -1,4 +1,4 @@
-import { sendRequest, addContactRequest, addGroupRequest, groupMember, chatStatus, sendIsTyping } from '../proto/hermes_pb';
+import { sendRequest, addContactRequest, addGroupRequest, groupMember, chatStatus, sendIsTyping, historyMessagesRequest } from '../proto/hermes_pb';
 import { ChatterClient } from '../proto/hermes_grpc_web_pb';
 import { CallCredentials } from '@grpc/grpc-js/build/src/call-credentials'
 import store from '../store'
@@ -203,6 +203,31 @@ class ChatService {
     }
 
   }
+  fetchOldMessages(messageId) {
+    let request = new historyMessagesRequest();
+
+    const selectedContact = store.getters['user/selected_contact'];
+    request.setContactid(selectedContact.id);
+    if (messageId) {
+      request.setPageLastid(messageId);
+    }
+
+    return new Promise((resolve, reject) => client.historyMessages(request, metadata, function (err,response) {
+      if (err) {
+        return reject(err)
+      }
+      const resp = response.toObject();
+      let fetchedMessages = [];
+
+      resp.messagesList.forEach(c => {
+        store.commit("chat/addOldChatMessage", { chatMessage: c, contactId: selectedContact.id });
+        fetchedMessages.push(c);
+      })
+     var result = { lastid : resp.nextPageToken, messages: fetchedMessages}
+      resolve(result);
+    }))
+
+  }
 
   sendIsTyping() {
     let cs = new chatStatus();
@@ -217,9 +242,9 @@ class ChatService {
           console.log(err.code);
           console.log(err.message);
         }
+
       });
     }
-
   }
 
   getContacts() {

@@ -2,13 +2,14 @@
   <div class="view-container">
     <ContactsListComponent :contacts="contacts" v-model="contacts" />
     <ChatWindowComponent class="chat-window" v-if="isContactSelected" :messages="currentMessages"
-      :unreadMessages="unreadMessages" v-model="currentMessages" @update-unread="updateUnreadMessages" />
+      :unreadMessages="unreadMessages" v-model="currentMessages" @update-unread="updateUnreadMessages"
+      :contactName="contactName" />
   </div>
 </template>
 <script>
 import ContactsListComponent from "./ContactsListComponent.vue";
 import ChatWindowComponent from "./ChatWindowComponent.vue";
-import { mapState } from 'vuex'
+import { mapState } from 'vuex';
 
 export default {
   name: "HermesChatFeatureComponent",
@@ -31,7 +32,8 @@ export default {
   },
   computed: {
     ...mapState('user', {
-      isContactSelected: state => state.selected_contact !== null
+      isContactSelected: state => state.selected_contact !== null,
+      contactName: state => state.selected_contact?.name
     }),
     ...mapState('chat', {
       chats: state => state.chats
@@ -107,6 +109,11 @@ export default {
         });
         document.dispatchEvent(event);
       }
+      if (this.chats[event.detail.contact.id].length) {
+        this.chats[event.detail.contact.id] = this.$store.getters['chat/getCachedMessages'](event.detail.contact.id);
+      }
+
+
       this.currentMessages = this.chats[event.detail.contact.id];
       this.unreadMessages = 0;
       for (let index = 0; index < this.contacts.length; index++) {

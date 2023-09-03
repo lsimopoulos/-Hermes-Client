@@ -20,6 +20,7 @@ import {
   faPaperPlane,
   faEnvelope,
   faAddressBook,
+  faHistory,
   faPlus,
   faKey,
   faAngleDoubleDown,
@@ -27,7 +28,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 
-library.add(faHome, faInfo, faUserPlus, faSignInAlt, faSignOutAlt, faLock, faEnvelope, faKey, faAddressBook, faPlus, faPaperPlane, faAngleDoubleDown,faUserGroup);
+library.add(faHome, faInfo, faUserPlus, faSignInAlt, faSignOutAlt, faLock, faEnvelope, faKey, faAddressBook, faPlus, faPaperPlane, faAngleDoubleDown,faUserGroup, faHistory);
 
 let app = createApp(App)
 
